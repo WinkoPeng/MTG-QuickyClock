@@ -1,0 +1,54 @@
+/* app/admin.module.css */
+.container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .sidebar {
+    width: 200px;
+    background-color: #2c3e50;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .sidebarItem {
+    color: white;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    background-color: #34495e;
+    text-align: center;
+    border-radius: 4px;
+  }
+  
+  .sidebarItem:hover {
+    background-color: #1abc9c;
+  }
+  
+  .main {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ecf0f1;
+  }
+  
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
