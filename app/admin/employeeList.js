@@ -76,10 +76,10 @@ function EmployeeList({ onEdit }) {
             <h3>{employee.name}</h3>
             <p>Status: <span style={{ color: employee.status === 'online' ? 'green' : 'grey', fontWeight: 'bold' }}>{employee.status === 'online' ? 'Online' : 'Offline'}</span></p>
             <p>Class: {employee.class}</p>
-            <p>Today's Work Hours: {formatWorkDuration(employee.workDurationToday)}</p>
-            <p>This Month's Work Hours: {formatWorkDuration(employee.thisMonthWorkDuration)}</p>
-            <p>Last Month's Work Hours: {formatWorkDuration(employee.lastMonthWorkDuration)}</p>
-            <p>Two Weeks' Work Hours: {formatWorkDuration(employee.twoWeeksWorkDuration)}</p>
+            <p>Today&apos;s Work Hours: {formatWorkDuration(employee.workDurationToday)}</p>
+            <p>This Month&apos;s Work Hours: {formatWorkDuration(employee.thisMonthWorkDuration)}</p>
+            <p>Last Month&apos;s Work Hours: {formatWorkDuration(employee.lastMonthWorkDuration)}</p>
+            <p>Two Weeks&apos; Work Hours: {formatWorkDuration(employee.twoWeeksWorkDuration)}</p>
             <button onClick={() => onEdit(employee)} className={styles.button}>Edit</button>
           </div>
         ))}

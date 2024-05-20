@@ -1,4 +1,3 @@
-// dashboard.js
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -48,7 +47,7 @@ function Dashboard() {
   return (
     <div className={styles.dashboard}>
       <div className={styles.card}>
-        <h3>Today's Work Count: {onlineCount}/{totalEmployees} (Total Amount)</h3>
+        <h3>Today&apos;s Work Count: {onlineCount}/{totalEmployees} (Total Amount)</h3>
       </div>
       <div className={styles.card}>
         <h3>Employees Working Today</h3>
