@@ -1,8 +1,7 @@
-// Employee.js
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { DateTime } from 'luxon';
 
 import styles from './employee.module.css';
@@ -52,9 +51,9 @@ const Employee = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const addLog = (message) => {
+  const addLog = useCallback((message) => {
     setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
-  };
+  }, [currentTime]);
 
   const handleBreakTimeChange = (event) => {
     setBreakTime(event.target.value);
@@ -106,7 +105,7 @@ const Employee = () => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [isClockedIn, userId, clockInTime, totalBreakDuration, isOnBreak, breakTimer]);
+  }, [isClockedIn, userId, clockInTime, totalBreakDuration, isOnBreak, breakTimer, addLog]);
 
   return (
     <div className={styles.container}>
