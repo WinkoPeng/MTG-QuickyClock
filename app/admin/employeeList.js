@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import db from '../firebase';
 import styles from './admin.module.css';
@@ -12,14 +12,15 @@ function EmployeeList({ onEdit }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      const querySnapshot = await getDocs(collection(db, 'employee'));
-      const employeeData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setEmployees(employeeData);
-    };
-    fetchEmployees();
+  const fetchEmployees = useCallback(async () => {
+    const querySnapshot = await getDocs(collection(db, 'employee'));
+    const employeeData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setEmployees(employeeData);
   }, []);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
