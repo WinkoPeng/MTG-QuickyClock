@@ -1,14 +1,20 @@
+// Employee.js
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import styles from './employee.module.css';
 import { DateTime } from 'luxon';
+
+import styles from './employee.module.css';
+import withAuth from '../withAuth';
+import { handleLogin, handleLogout } from './auth';
+import { handleClockIn, handleClockOut } from './timer';
 
 const Employee = () => {
   const router = useRouter();
   const [currentTime, setCurrentTime] = useState(DateTime.now().setZone('America/Edmonton').toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS));
-  const userName = "Aaron";
+  const [userName, setUserName] = useState('');
+  const [userId, setUserId] = useState('');
   const [breakTime, setBreakTime] = useState('');
   const [customBreakTime, setCustomBreakTime] = useState('');
   const [selectedOption, setSelectedOption] = useState('select');
@@ -21,6 +27,15 @@ const Employee = () => {
   const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
+    const storedUserName = localStorage.getItem('userName');
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+
     const timer = setInterval(() => {
       const now = DateTime.now().setZone('America/Edmonton');
       setCurrentTime(now.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS));
@@ -37,8 +52,8 @@ const Employee = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleLogout = () => {
-    router.push('/');
+  const addLog = (message) => {
+    setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
   };
 
   const handleBreakTimeChange = (event) => {
@@ -57,42 +72,6 @@ const Employee = () => {
       setCustomBreakTime('');
     } else {
       setBreakTime('');
-    }
-  };
-
-  const addLog = (message) => {
-    setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
-  };
-
-  const handleClockIn = () => {
-    setIsClockedIn(true);
-    setClockInTime(DateTime.now().setZone('America/Edmonton'));
-    addLog(`Clocked In at ${currentTime}`);
-  };
-
-  const handleClockOut = () => {
-    if (confirm('Are you sure you want to clock out?')) {
-      if (isOnBreak) {
-        clearTimeout(breakTimer);
-        addLog(`Break ended at ${DateTime.now().setZone('America/Edmonton').toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}`);
-        setTotalBreakDuration((prevDuration) => prevDuration + (DateTime.now().setZone('America/Edmonton') - clockInTime) / 60000);
-        setIsOnBreak(false);
-      }
-      setIsClockedIn(false);
-      const clockOutTime = DateTime.now().setZone('America/Edmonton');
-      const workDuration = clockOutTime.diff(clockInTime, ['hours', 'minutes']).minus({ minutes: totalBreakDuration });
-
-      let hours = workDuration.hours;
-      let minutes = workDuration.minutes;
-
-      if (hours < 0 || (hours === 0 && minutes < 0)) {
-        hours = 0;
-        minutes = 0;
-      }
-
-      addLog(`Clocked Out at ${currentTime}`);
-      addLog(`Duration: ${Math.floor(hours)} hours ${Math.floor(minutes)} minutes, from ${clockInTime.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)} to ${clockOutTime.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}`);
-      setTotalBreakDuration(0);
     }
   };
 
@@ -117,16 +96,27 @@ const Employee = () => {
     );
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = async (event) => {
+      if (isClockedIn && confirm('Are you sure you want to close the window? You will be clocked out.')) {
+        await handleClockOut(userId, setIsClockedIn, setTotalBreakDuration, addLog, clockInTime, totalBreakDuration, isOnBreak, breakTimer, setIsOnBreak);
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isClockedIn, userId, clockInTime, totalBreakDuration, isOnBreak, breakTimer]);
+
   return (
     <div className={styles.container}>
       <div className={styles.formContainer}>
-        <img src="/images/man.jpg" alt="Profile" className={styles.profilePic} />
         <h1>{greeting}, {userName}!</h1>
         <div className={styles.currentTime}>Current Time: {currentTime}</div>
         <div className={styles.buttonAndBreakGroup}>
           <div className={styles.buttonGroup}>
-            <button className={`${styles.clockInButton} ${isClockedIn ? styles.disabledButton : ''}`} onClick={handleClockIn} disabled={isClockedIn}>Clock In</button>
-            <button className={`${styles.clockOutButton} ${!isClockedIn ? styles.disabledButton : ''}`} onClick={handleClockOut} disabled={!isClockedIn}>Clock Out</button>
+            <button className={`${styles.clockInButton} ${isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockIn(userId, setClockInTime, setIsClockedIn, addLog)} disabled={isClockedIn}>Clock In</button>
+            <button className={`${styles.clockOutButton} ${!isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockOut(userId, setIsClockedIn, setTotalBreakDuration, addLog, clockInTime, totalBreakDuration, isOnBreak, breakTimer, setIsOnBreak)} disabled={!isClockedIn}>Clock Out</button>
           </div>
           <div className={styles.breakGroup}>
             <div className={styles.breakOption}>
@@ -190,10 +180,10 @@ const Employee = () => {
             </tbody>
           </table>
         </div>
-        <button className={styles.logoutButton} onClick={handleLogout}>Log Out</button>
+        <button className={styles.logoutButton} onClick={() => handleLogout(isClockedIn, () => handleClockOut(userId, setIsClockedIn, setTotalBreakDuration, addLog, clockInTime, totalBreakDuration, isOnBreak, breakTimer, setIsOnBreak), router)}>Log Out</button>
       </div>
     </div>
   );
 };
 
-export default Employee;
+export default withAuth(Employee);

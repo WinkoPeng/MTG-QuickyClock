@@ -1,19 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import withAuth from '../withAuth';
 import styles from './admin.module.css';
+import { Register } from './register';
+import EmployeeList from './employeeList';
+import Dashboard from './dashboard';
+import Edit from './edit'; // Import the Edit component
 
-export default function Admin() {
+function Admin() {
   const [selectedPage, setSelectedPage] = useState('Dashboard');
-  
+  const [adminName, setAdminName] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState(null); // State to store selected employee
+  const router = useRouter();
+
+  useEffect(() => {
+    const name = localStorage.getItem('adminName');
+    if (name) {
+      setAdminName(name);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminName');
+    router.push('/');
+  };
+
   const renderPage = () => {
     switch (selectedPage) {
       case 'Dashboard':
         return <Dashboard />;
-      case 'Employee':
-        return <EmployeeList />;
+      case 'Employee List':
+        return <EmployeeList onEdit={(employee) => { setSelectedEmployee(employee); setSelectedPage('Edit'); }} />;
       case 'Register':
         return <Register />;
+      case 'Edit':
+        return <Edit employee={selectedEmployee} onCancel={() => setSelectedPage('Employee List')} />;
       default:
         return <Dashboard />;
     }
@@ -22,9 +45,18 @@ export default function Admin() {
   return (
     <div className={styles.container}>
       <div className={styles.sidebar}>
-        <div className={styles.sidebarItem} onClick={() => setSelectedPage('Dashboard')}>Dashboard</div>
-        <div className={styles.sidebarItem} onClick={() => setSelectedPage('Employee')}>Employee</div>
-        <div className={styles.sidebarItem} onClick={() => setSelectedPage('Register')}>Register</div>
+        <div className={styles.welcome}>
+          <h3>Welcome,</h3>
+          <h2>{adminName}</h2>
+        </div>
+        <div className={styles.menu}>
+          <div className={styles.sidebarItem} onClick={() => setSelectedPage('Dashboard')}>Dashboard</div>
+          <div className={styles.sidebarItem} onClick={() => setSelectedPage('Employee List')}>Employee List</div>
+          <div className={styles.sidebarItem} onClick={() => setSelectedPage('Register')}>Register</div>
+        </div>
+        <div className={styles.logout}>
+          <button onClick={handleLogout} className={styles.logout}>Logout</button>
+        </div>
       </div>
       <div className={styles.main}>
         {renderPage()}
@@ -33,21 +65,4 @@ export default function Admin() {
   );
 }
 
-function Dashboard() {
-  return (
-    <div className={styles.dashboard}>
-      <div className={styles.card}>Today's Work Count: x/Total</div>
-      <div className={styles.card}>Employees Working Today (Green: Online, Grey: Offline)</div>
-      <div className={styles.card}>Real-time Online Count</div>
-      <div className={styles.card}>Average Work Hours Today</div>
-    </div>
-  );
-}
-
-function EmployeeList() {
-  return <div className={styles.content}>Employee List Page</div>;
-}
-
-function Register() {
-  return <div className={styles.content}>Register Page</div>;
-}
+export default withAuth(Admin);

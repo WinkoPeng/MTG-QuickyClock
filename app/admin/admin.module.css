@@ -1,54 +1,286 @@
-/* app/admin.module.css */
 .container {
-    display: flex;
-    height: 100vh;
-  }
-  
-  .sidebar {
-    width: 200px;
-    background-color: #2c3e50;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-  }
-  
-  .sidebarItem {
-    color: white;
-    padding: 10px;
-    margin: 5px 0;
-    cursor: pointer;
-    background-color: #34495e;
-    text-align: center;
-    border-radius: 4px;
-  }
-  
-  .sidebarItem:hover {
-    background-color: #1abc9c;
-  }
-  
-  .main {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: #ecf0f1;
-  }
-  
-  .dashboard {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  
-  .card {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.welcome {
+  text-align: center;
+}
+
+.welcome h3 {
+  margin: 0;
+  color: #fff;
+}
+
+.welcome h2 {
+  margin: 5px 0 0;
+  color: #fff;
+}
+
+.menu {
+  flex-grow: 1;
+}
+
+.sidebarItem {
+  color: white;
+  padding: 10px;
+  margin: 13px 0;
+  cursor: pointer;
+  background-color: #34495e;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.sidebarItem:hover {
+  background-color: #1abc9c;
+}
+
+.logout {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.logout button {
+  padding: 10px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 60px;
+  width: 120px;
+}
+
+.logout button:hover {
+  background-color: #c0392b;
+}
+
+.main {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #ecf0f1;
+  overflow-y: auto;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.register {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: auto;
+  overflow: hidden;
+  max-height: calc(100vh - 60px); /* Ensure the form is scrollable */
+  overflow-y: auto; /* Ensure the form is scrollable */
+}
+
+.register h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.register form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.register .input,
+.register select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.register .formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.register .formGroup label {
+  margin-bottom: 5px;
+}
+
+.register .workHours {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.register .workHoursRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.register .workHoursRow label {
+  flex: 1;
+}
+
+.register .workHoursRow .inputTime {
+  margin-left: auto;
+  margin-right: 5px;
+  width: 100px;
+  height: 30px;
+}
+
+.register .workHoursRow span {
+  margin: 0 10px;
+}
+
+.register .buttonGroup {
+  display: flex;
+  justify-content: space-between;
+}
+
+.register .saveButton,
+.register .cancelButton,
+.register .button {
+  padding: 10px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 150px;
+  height: 50px;
+  text-align: center;
+}
+
+.register .saveButton {
+  background-color: #0070f3;
+}
+
+.register .saveButton:hover {
+  background-color: #005bb5;
+}
+
+.register .cancelButton {
+  background-color: #e74c3c;
+}
+
+.register .cancelButton:hover {
+  background-color: #c0392b;
+}
+
+.register .button {
+  background-color: #0070f3;
+  align-self: center;
+}
+
+.register .button:hover {
+  background-color: #005bb5;
+}
+
+.durationFields {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.searchBar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.searchBar .input,
+.searchBar select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.searchBar .input {
+  flex: 2;
+}
+
+.searchBar select {
+  flex: 1;
+}
+
+.searchBar .exportButton {
+  padding: 10px;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 44px; /* Ensure consistent height with inputs */
+}
+
+.searchBar .exportButton:hover {
+  background-color: #229954;
+}
+
+.employeeList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.employeeCard {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
+}
+
+.employeeCard h3 {
+  margin: 0;
+}
+
+.employeeCard p {
+  margin: 5px 0;
+}
+
+.employeeCard .button {
+  padding: 10px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.employeeCard .button:hover {
+  background-color: #005bb5;
+}

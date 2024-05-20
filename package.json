@@ -9,11 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "chart.js": "^4.4.3",
+    "file-saver": "^2.0.5",
     "firebase": "^10.12.0",
     "luxon": "^3.4.4",
     "next": "14.2.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "eslint": "^8",
