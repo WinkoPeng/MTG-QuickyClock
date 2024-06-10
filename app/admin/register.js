@@ -9,6 +9,7 @@ function Register() {
     password: '',
     name: '',
     class: 'employee',
+    title: 'Administrative Officer', // Add title field
     gender: 'male',
     email: '',
     cell: '',
@@ -21,7 +22,8 @@ function Register() {
       Friday: { start: '', end: '' },
       Saturday: { start: '', end: '' },
       Sunday: { start: '', end: '' }
-    }
+    },
+    workPeriod: [] // Add workPeriod field
   });
 
   const handleChange = (e) => {
@@ -110,6 +112,7 @@ function Register() {
         password: '',
         name: '',
         class: 'employee',
+        title: 'Administrative Officer', // Reset title field
         gender: 'male',
         email: '',
         cell: '',
@@ -122,7 +125,8 @@ function Register() {
           Friday: { start: '', end: '' },
           Saturday: { start: '', end: '' },
           Sunday: { start: '', end: '' }
-        }
+        },
+        workPeriod: [] // Reset workPeriod field
       });
     } catch (error) {
       console.error('Error adding document: ', error);
@@ -140,6 +144,12 @@ function Register() {
         <select name="class" value={formData.class} onChange={handleChange} required className={styles.input}>
           <option value="employee">Employee</option>
           <option value="admin">Admin</option>
+        </select>
+        <select name="title" value={formData.title} onChange={handleChange} required className={styles.input}>
+          <option value="Administrative Officer">Administrative Officer</option>
+          <option value="Program Coordinator">Program Coordinator</option>
+          <option value="Instructor">Instructor</option>
+          <option value="Receptionist">Receptionist</option>
         </select>
         <select name="gender" value={formData.gender} onChange={handleChange} required className={styles.input}>
           <option value="male">Male</option>

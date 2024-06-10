@@ -1,3 +1,4 @@
+/* app/page.module.css */
 .container {
   display: flex;
   height: 100vh;
@@ -126,6 +127,7 @@
 .register .formGroup {
   display: flex;
   flex-direction: column;
+  margin: 5px;
 }
 
 .register .formGroup label {
@@ -162,6 +164,7 @@
 .register .buttonGroup {
   display: flex;
   justify-content: space-between;
+  margin: 8px;
 }
 
 .register .saveButton,
@@ -283,4 +286,28 @@
 
 .employeeCard .button:hover {
   background-color: #005bb5;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.exportButton {
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 10px 20px;
+}
+
+.exportButton:hover {
+  background-color: #229954;
+}
+
+.editTitle {
+  margin-top: 10px;
 }

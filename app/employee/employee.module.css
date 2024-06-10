@@ -62,6 +62,18 @@
   color: white;
 }
 
+.changePasswordButton {
+  padding: 20px 40px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #2196F3;
+  color: white;
+  font-size: 1.2em;
+  width: 200px;
+  margin-top: 10px;
+}
+
 .startBreakButton {
   padding: 20px 40px;
   border: none;
@@ -144,8 +156,68 @@
   background-color: darkred;
 }
 
-.currentTimeText {
-  justify-content: flex-end;
-  padding-right: 150px;
-  margin-top: 15px;
+/* 适用于密码修改弹框 */
+.passwordModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.passwordModalContent {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.formGroup input {
+  width: calc(100% - 10px);
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.passwordModalButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.passwordModalButtons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1em;
+}
+
+.passwordModalButtons button[type="button"] {
+  background-color: #f44336;
+}
+
+.passwordModalButtons button:hover {
+  background-color: #246727;
+}
+
+.passwordModalButtons button[type="button"]:hover {
+  background-color: darkred;
+}
+

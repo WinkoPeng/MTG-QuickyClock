@@ -3,11 +3,12 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { DateTime } from 'luxon';
+import { query, where, getDocs, collection } from 'firebase/firestore';
+import db from '../firebase';
 
 import styles from './employee.module.css';
 import withAuth from '../withAuth';
-import { handleLogin, handleLogout } from './auth';
-import { handleClockIn, handleClockOut } from './timer';
+import { handleClockIn, handleClockOut, updateWorkDuration, handleStartBreak } from './timer';
 
 const Employee = () => {
   const router = useRouter();
@@ -24,6 +25,15 @@ const Employee = () => {
   const [clockInTime, setClockInTime] = useState(null);
   const [totalBreakDuration, setTotalBreakDuration] = useState(0);
   const [greeting, setGreeting] = useState('');
+  const [autoLogoutTime, setAutoLogoutTime] = useState(600); // 10 minutes in seconds
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
+  const addLog = useCallback((message) => {
+    setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
+  }, [currentTime]);
 
   useEffect(() => {
     const storedUserName = localStorage.getItem('userName');
@@ -35,9 +45,32 @@ const Employee = () => {
       setUserId(storedUserId);
     }
 
+    const fetchData = async () => {
+      if (storedUserId) {
+        const employeeQuery = query(collection(db, 'employee'), where('id', '==', storedUserId));
+        const querySnapshot = await getDocs(employeeQuery);
+
+        if (!querySnapshot.empty) {
+          const employeeDoc = querySnapshot.docs[0];
+          const employeeData = employeeDoc.data();
+
+          if (employeeData.status === 'online') {
+            setIsClockedIn(true);
+            updateWorkDuration(storedUserId); // Continue updating work duration if user is online
+          } else {
+            setIsClockedIn(false);
+          }
+        }
+      }
+    };
+
+    fetchData();
+
     const timer = setInterval(() => {
       const now = DateTime.now().setZone('America/Edmonton');
       setCurrentTime(now.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS));
+      setAutoLogoutTime(prevTime => (prevTime <= 1 ? handleAutoLogout() : prevTime - 1));
+
       const hour = now.hour;
       if (hour < 12) {
         setGreeting('Good morning');
@@ -51,9 +84,10 @@ const Employee = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const addLog = useCallback((message) => {
-    setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
-  }, [currentTime]);
+  const handleAutoLogout = () => {
+    router.push('/');
+    return 600;
+  };
 
   const handleBreakTimeChange = (event) => {
     setBreakTime(event.target.value);
@@ -74,48 +108,68 @@ const Employee = () => {
     }
   };
 
-  const handleStartBreak = () => {
+  const handleStartBreakClick = () => {
     let breakDuration = selectedOption === 'select' ? breakTime : customBreakTime;
     if (breakDuration === '' || parseInt(breakDuration) === 0) {
       alert('Break duration must be greater than 0 and not empty.');
       return;
     }
-    setIsOnBreak(true);
-    addLog(`Break started at ${currentTime}`);
-    breakDuration = parseInt(breakDuration) * 60 * 1000; // convert minutes to milliseconds
-
-    setBreakTimer(
-      setTimeout(() => {
-        addLog(`Break ended at ${DateTime.now().setZone('America/Edmonton').toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}`);
-        alert('Break ended');
-        setIsOnBreak(false);
-        setTotalBreakDuration((prevDuration) => prevDuration + (breakDuration / 60000)); // add break duration in minutes
-        setBreakTimer(null);
-      }, breakDuration)
-    );
+    handleStartBreak(userId, setIsOnBreak, setBreakTimer, breakDuration, addLog);
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = async (event) => {
-      if (isClockedIn && confirm('Are you sure you want to close the window? You will be clocked out.')) {
-        await handleClockOut(userId, setIsClockedIn, setTotalBreakDuration, addLog, clockInTime, totalBreakDuration, isOnBreak, breakTimer, setIsOnBreak);
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmNewPassword) {
+      alert('New password and confirm new password do not match.');
+      return;
+    }
+
+    try {
+      const employeeQuery = query(collection(db, 'employee'), where('id', '==', userId));
+      const querySnapshot = await getDocs(employeeQuery);
+
+      if (querySnapshot.empty) {
+        alert('Employee ID does not exist');
+        return;
       }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [isClockedIn, userId, clockInTime, totalBreakDuration, isOnBreak, breakTimer, addLog]);
+
+      const employeeDoc = querySnapshot.docs[0];
+      const employeeData = employeeDoc.data();
+
+      if (employeeData.password !== currentPassword) {
+        alert('Current password is incorrect.');
+        return;
+      }
+
+      const docRef = doc(db, 'employee', employeeDoc.id);
+
+      await updateDoc(docRef, {
+        password: newPassword
+      });
+
+      alert('Password changed successfully!');
+      setShowPasswordModal(false);
+    } catch (error) {
+      console.error('Error updating password: ', error);
+      alert('Error updating password.');
+    }
+  };
+
+  const handleLogout = () => {
+    router.push('/');
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.formContainer}>
         <h1>{greeting}, {userName}!</h1>
         <div className={styles.currentTime}>Current Time: {currentTime}</div>
+        <div className={styles.currentTime}>Auto Logout In: {Math.floor(autoLogoutTime / 60)}:{String(autoLogoutTime % 60).padStart(2, '0')}</div>
         <div className={styles.buttonAndBreakGroup}>
           <div className={styles.buttonGroup}>
             <button className={`${styles.clockInButton} ${isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockIn(userId, setClockInTime, setIsClockedIn, addLog)} disabled={isClockedIn}>Clock In</button>
             <button className={`${styles.clockOutButton} ${!isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockOut(userId, setIsClockedIn, setTotalBreakDuration, addLog, clockInTime, totalBreakDuration, isOnBreak, breakTimer, setIsOnBreak)} disabled={!isClockedIn}>Clock Out</button>
+            <button className={styles.changePasswordButton} onClick={() => setShowPasswordModal(true)}>Change Password</button>
           </div>
           <div className={styles.breakGroup}>
             <div className={styles.breakOption}>
@@ -158,7 +212,7 @@ const Employee = () => {
                 min="1"
               />
             </div>
-            <button className={`${styles.startBreakButton} ${!isClockedIn || isOnBreak ? styles.disabledButton : ''}`} onClick={handleStartBreak} disabled={!isClockedIn || isOnBreak}>Start Break</button>
+            <button className={`${styles.startBreakButton} ${!isClockedIn || isOnBreak ? styles.disabledButton : ''}`} onClick={handleStartBreakClick} disabled={!isClockedIn || isOnBreak}>Start Break</button>
           </div>
         </div>
         <div className={styles.log}>
@@ -179,8 +233,34 @@ const Employee = () => {
             </tbody>
           </table>
         </div>
-        <button className={styles.logoutButton} onClick={() => handleLogout(isClockedIn, () => handleClockOut(userId, setIsClockedIn, setTotalBreakDuration, addLog, clockInTime, totalBreakDuration, isOnBreak, breakTimer, setIsOnBreak), router)}>Log Out</button>
+        <button className={styles.logoutButton} onClick={handleLogout}>Log Out</button>
       </div>
+
+      {showPasswordModal && (
+        <div className={styles.passwordModal}>
+          <div className={styles.passwordModalContent}>
+            <h2>Change Password</h2>
+            <form onSubmit={handlePasswordChange}>
+              <div className={styles.formGroup}>
+                <label>Current Password:</label>
+                <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+              </div>
+              <div className={styles.formGroup}>
+                <label>New Password:</label>
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Confirm New Password:</label>
+                <input type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} />
+              </div>
+              <div className={styles.passwordModalButtons}>
+                <button type="submit">Confirm</button>
+                <button type="button" onClick={() => setShowPasswordModal(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

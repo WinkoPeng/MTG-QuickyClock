@@ -9,6 +9,7 @@ import styles from './dashboard.module.css';
 
 function Dashboard() {
   const [employeeData, setEmployeeData] = useState([]);
+  const [workingTodayCount, setWorkingTodayCount] = useState(0);
   const [onlineCount, setOnlineCount] = useState(0);
   const [totalEmployees, setTotalEmployees] = useState(0);
   const [averageWorkHours, setAverageWorkHours] = useState({ hours: 0, minutes: 0 });
@@ -18,14 +19,23 @@ function Dashboard() {
       const querySnapshot = await getDocs(collection(db, "employee"));
       const employees = querySnapshot.docs.map(doc => doc.data());
 
-      const onlineEmployees = employees.filter(emp => emp.status === 'online');
+      const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+      console.log(today);
+
+      const employeesWorkingToday = employees.filter(emp => {
+        const workHours = emp.workHours[today];
+        return workHours && workHours !== " - ";
+      });
+
+      const onlineEmployees = employeesWorkingToday.filter(emp => emp.status === 'online');
+
       const totalWorkHoursInMinutes = employees.reduce((acc, emp) => acc + (emp.workDurationToday || 0), 0);
       const avgWorkHoursInMinutes = totalWorkHoursInMinutes / employees.length;
-
       const avgHours = Math.floor(avgWorkHoursInMinutes / 60);
       const avgMinutes = Math.floor(avgWorkHoursInMinutes % 60);
 
-      setEmployeeData(employees);
+      setEmployeeData(employeesWorkingToday);
+      setWorkingTodayCount(employeesWorkingToday.length);
       setOnlineCount(onlineEmployees.length);
       setTotalEmployees(employees.length);
       setAverageWorkHours({ hours: avgHours, minutes: avgMinutes });
@@ -38,7 +48,7 @@ function Dashboard() {
     labels: ['Online', 'Offline'],
     datasets: [
       {
-        data: [onlineCount, totalEmployees - onlineCount],
+        data: [onlineCount, workingTodayCount - onlineCount],
         backgroundColor: ['#4caf50', '#9e9e9e']
       }
     ]
@@ -47,7 +57,7 @@ function Dashboard() {
   return (
     <div className={styles.dashboard}>
       <div className={styles.card}>
-        <h3>Today&apos;s Work Count: {onlineCount}/{totalEmployees} (Total Amount)</h3>
+        <h3>Today&apos;s Work Count: {workingTodayCount}/{totalEmployees} (Total Amount)</h3>
       </div>
       <div className={styles.card}>
         <h3>Employees Working Today</h3>
@@ -63,7 +73,7 @@ function Dashboard() {
         </ul>
       </div>
       <div className={styles.card}>
-        <h3>Real-time Online Count</h3>
+        <h3>Real-time Online Count: {onlineCount}</h3>
         <div className={styles.pieChartContainer}>
           <Pie data={pieData} />
         </div>

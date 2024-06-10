@@ -6,6 +6,7 @@ import db from '../firebase';
 import styles from './admin.module.css';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
+import { DateTime } from 'luxon';
 
 function EmployeeList({ onEdit }) {
   const [employees, setEmployees] = useState([]);
@@ -31,7 +32,22 @@ function EmployeeList({ onEdit }) {
   };
 
   const handleExport = () => {
-    const worksheet = XLSX.utils.json_to_sheet(employees);
+    const exportData = employees.map(employee => ({
+      id: employee.id,
+      gender: employee.gender,
+      class: employee.class,
+      title: employee.title,
+      address: employee.address,
+      email: employee.email,
+      cell: employee.cell,
+      lastOnlineDate: employee.lastOnlineDate,
+      totalWorkDuration: employee.totalWorkDuration,
+      workDurationToday: employee.workDurationToday,
+      thisMonthWorkDuration: employee.thisMonthWorkDuration,
+      twoWeeksWorkDuration: employee.twoWeeksWorkDuration,
+      lastMonthWorkDuration: employee.lastMonthWorkDuration,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Employees');
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -45,15 +61,24 @@ function EmployeeList({ onEdit }) {
     return `${hours} hours ${minutes} mins`;
   };
 
+  const getToday = () => {
+    const today = DateTime.now().setZone('America/Edmonton').toFormat('cccc');
+    return today;
+  };
+
+  const today = getToday();
+
   const filteredEmployees = employees.filter(employee => {
     const matchesSearch = searchTerm === '' || Object.values(employee).some(value => value.toString().toLowerCase().includes(searchTerm));
     const isOnline = employee.status === 'online';
     const workDurationToday = employee.workDurationToday || 0;
 
-    let matchesFilter = true;
-    if (filter === 'online') matchesFilter = isOnline;
-    if (filter === 'workingToday') matchesFilter = workDurationToday > 0;
-    if (filter === 'offToday') matchesFilter = workDurationToday === 0;
+    const isWorkingToday = employee.workHours && employee.workHours[today] !== ' - ';
+    const matchesFilter = 
+      (filter === 'all') ||
+      (filter === 'online' && isOnline) ||
+      (filter === 'workingToday' && isWorkingToday) ||
+      (filter === 'offToday' && !isWorkingToday);
 
     return matchesSearch && matchesFilter;
   });
@@ -73,13 +98,10 @@ function EmployeeList({ onEdit }) {
       <div className={styles.employeeList}>
         {filteredEmployees.map(employee => (
           <div key={employee.id} className={styles.employeeCard}>
-            <h3>{employee.name}</h3>
+            <h3>{employee.name} - {employee.title}</h3>
             <p>Status: <span style={{ color: employee.status === 'online' ? 'green' : 'grey', fontWeight: 'bold' }}>{employee.status === 'online' ? 'Online' : 'Offline'}</span></p>
-            <p>Class: {employee.class}</p>
             <p>Today&apos;s Work Hours: {formatWorkDuration(employee.workDurationToday)}</p>
-            <p>This Month&apos;s Work Hours: {formatWorkDuration(employee.thisMonthWorkDuration)}</p>
-            <p>Last Month&apos;s Work Hours: {formatWorkDuration(employee.lastMonthWorkDuration)}</p>
-            <p>Two Weeks&apos; Work Hours: {formatWorkDuration(employee.twoWeeksWorkDuration)}</p>
+            <p>This Month&apos;s Work Hours: {formatWorkDuration(employee.thisMonthWorkDuration || 0)}</p>
             <button onClick={() => onEdit(employee)} className={styles.button}>Edit</button>
           </div>
         ))}

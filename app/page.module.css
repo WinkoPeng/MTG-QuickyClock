@@ -9,7 +9,17 @@
   display: flex;
   justify-content: flex-end; 
   align-items: center;
-  padding-right: 300px;
+  padding-right: 200px; /* Adjust padding for alignment */
+}
+
+.logo {
+  margin-bottom: 15px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .formContainer {
@@ -50,4 +60,16 @@
   color: #0070f3;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.copyright {
+  display: flex;
+  justify-content: right;
+  margin-right: 400px;
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
 }
