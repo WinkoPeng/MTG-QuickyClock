@@ -1,4 +1,3 @@
-/* app/page.module.css */
 .container {
   display: flex;
   height: 100vh;
@@ -138,7 +137,10 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
+
 
 .register .workHoursRow {
   display: flex;
@@ -264,6 +266,7 @@
   flex-direction: column;
   gap: 10px;
   text-align: center;
+  height: 100%; /* Ensure all cards have the same height */
 }
 
 .employeeCard h3 {
@@ -275,6 +278,7 @@
 }
 
 .employeeCard .button {
+  margin-top: auto; /* Ensure the button is at the bottom of the card */
   padding: 10px;
   background-color: #0070f3;
   color: white;
@@ -311,3 +315,106 @@
 .editTitle {
   margin-top: 10px;
 }
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.durationFields {
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.inputTime {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 122px;
+}
+
+.span {
+  margin-right: 10px;
+}
+
+.inputWorkHours {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 120px;
+}
+
+/* admin.module.css */
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #343a40;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  color: white;
+}
+
+.welcome {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.menu {
+  flex-grow: 1;
+}
+
+.sidebarItem {
+  padding: 10px 20px;
+  margin: 10px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: #495057;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+.sidebarItem:hover {
+  background-color: #1abc9c;
+}
+
+.logout {
+  text-align: center;
+  margin-top: auto;
+}
+
+.logout button {
+  padding: 10px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout button:hover {
+  background-color: #c0392b;
+}
+
+.main {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}
+

@@ -1,49 +1,158 @@
 /* dashboard.module.css */
+
 .dashboard {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  
-  .card {
-    background: #fff;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    flex: 1 1 45%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .employeeList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .employeeItem {
-    padding: 8px 16px;
-    border-radius: 8px;
-    background: #e0e0e0;
-    flex: 1 1 45%;
-  }
-  
-  .online {
-    background: #4caf50 !important;
-    color: #fff;
-  }
-  
-  .offline {
-    background: #9e9e9e !important;
-    color: #fff;
-  }
-  
-  .pieChartContainer {
-    width: 200px;  /* Adjusted size */
-    height: 200px;  /* Adjusted size */
-  }
-  
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.cardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  flex: 1 1 23%;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* 垂直居中 */
+  text-align: center; /* 水平居中 */
+}
+
+.cardPrimary {
+  background-color: #007bff;
+  color: white;
+}
+
+.cardWarning {
+  background-color: #ffc107;
+  color: black;
+}
+
+.cardSuccess {
+  background-color: #28a745;
+  color: white;
+}
+
+.cardDanger {
+  background-color: #e83e8c; /* 粉色 */
+  color: white;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.employeeTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+.employeeTag {
+  padding: 8px 16px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.employeeTag:hover {
+  background: #c8c8c8;
+}
+
+.selectedTag {
+  background: #4caf50 !important;
+  color: #fff !important;
+}
+
+.chartContainer {
+  display: flex;
+  gap: 20px;
+  text-align: center;
+  justify-content: center;
+
+}
+
+.chart {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  position: relative;
+}
+
+.employeeTable {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-top: 20px;
+}
+
+.searchBar {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.employeeTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.employeeTable th, .employeeTable td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.employeeTable th {
+  background-color: #f2f2f2;
+}
+
+.employeeList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0; /* 调整上边距和下边距 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.employeeItem {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #e0e0e0;
+  margin: 4px 0;
+  width: 90%;
+  text-align: center;
+}
+
+.online {
+  background: #4caf50 !important;
+  color: #fff;
+}
+
+.offline {
+  background: #9e9e9e !important;
+  color: #fff;
+}

@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation'; // Correct import for app directory
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import db from '../firebase';
 import styles from './admin.module.css';
-import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
 
 function Edit({ employee, onCancel }) {
   const router = useRouter();
@@ -16,7 +14,7 @@ function Edit({ employee, onCancel }) {
     password: '',
     name: '',
     class: 'employee',
-    title: 'Administrative Officer', // Add title field
+    title: 'Administrative Officer',
     gender: 'male',
     email: '',
     cell: '',
@@ -38,6 +36,9 @@ function Edit({ employee, onCancel }) {
     totalWorkDuration: { hours: 0, minutes: 0 }
   });
 
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDateWorkDuration, setSelectedDateWorkDuration] = useState({ hours: 0, minutes: 0 });
+
   useEffect(() => {
     if (employee) {
       const {
@@ -47,6 +48,7 @@ function Edit({ employee, onCancel }) {
         workDurationToday,
         totalWorkDuration,
         workHours,
+        workPeriod,
         ...rest
       } = employee;
 
@@ -59,8 +61,13 @@ function Edit({ employee, onCancel }) {
         workDurationToday: convertMinutesToHoursAndMinutes(workDurationToday),
         totalWorkDuration: convertMinutesToHoursAndMinutes(totalWorkDuration)
       });
+
+      // Set selected date work duration if workPeriod is available
+      if (workPeriod && selectedDate && workPeriod[selectedDate]) {
+        setSelectedDateWorkDuration(convertMinutesToHoursAndMinutes(workPeriod[selectedDate]));
+      }
     }
-  }, [employee]);
+  }, [employee, selectedDate]);
 
   const convertMinutesToHoursAndMinutes = (minutes) => {
     const hours = Math.floor(minutes / 60);
@@ -97,13 +104,20 @@ function Edit({ employee, onCancel }) {
       }));
     } else if (name.includes('.hours') || name.includes('.minutes')) {
       const [field, timeType] = name.split('.');
-      setFormData((prevData) => ({
-        ...prevData,
-        [field]: {
-          ...prevData[field],
+      if (field === 'selectedDateWorkDuration') {
+        setSelectedDateWorkDuration((prevDuration) => ({
+          ...prevDuration,
           [timeType]: value
-        }
-      }));
+        }));
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          [field]: {
+            ...prevData[field],
+            [timeType]: value
+          }
+        }));
+      }
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -112,21 +126,31 @@ function Edit({ employee, onCancel }) {
     }
   };
 
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+    if (employee.workPeriod && employee.workPeriod[e.target.value]) {
+      setSelectedDateWorkDuration(convertMinutesToHoursAndMinutes(employee.workPeriod[e.target.value]));
+    } else {
+      setSelectedDateWorkDuration({ hours: 0, minutes: 0 });
+    }
+  };
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const employeeQuery = query(collection(db, 'employee'), where('id', '==', formData.id));
       const querySnapshot = await getDocs(employeeQuery);
-
+  
       if (querySnapshot.empty) {
         alert('Employee ID does not exist');
         return;
       }
-
+  
       const employeeDoc = querySnapshot.docs[0];
       const docRef = doc(db, 'employee', employeeDoc.id);
-
+  
       const updatedFormData = {
         ...formData,
         lastMonthWorkDuration: convertHoursAndMinutesToMinutes(formData.lastMonthWorkDuration),
@@ -139,15 +163,27 @@ function Edit({ employee, onCancel }) {
           return acc;
         }, {})
       };
-
+  
+      if (selectedDate && (selectedDateWorkDuration.hours > 0 || selectedDateWorkDuration.minutes > 0)) {
+        updatedFormData.workPeriod = {
+          ...employee.workPeriod,
+          [selectedDate]: convertHoursAndMinutesToMinutes(selectedDateWorkDuration)
+        };
+      } else {
+        updatedFormData.workPeriod = {
+          ...employee.workPeriod
+        };
+      }
+  
       await updateDoc(docRef, updatedFormData);
       alert('Employee updated successfully!');
-      onCancel(); // Navigate back to the Employee List
+      onCancel();
     } catch (error) {
       console.error('Error updating document: ', error);
       alert('Error updating employee.');
     }
   };
+  
 
   const handleDelete = async () => {
     const confirmDelete = confirm('Are you sure you want to delete this employee?');
@@ -166,7 +202,7 @@ function Edit({ employee, onCancel }) {
 
         await deleteDoc(docRef);
         alert('Employee deleted successfully!');
-        onCancel(); // Navigate back to the Employee List
+        onCancel();
       } catch (error) {
         console.error('Error deleting document: ', error);
         alert('Error deleting employee.');
@@ -174,45 +210,9 @@ function Edit({ employee, onCancel }) {
     }
   };
 
-  const handleExport = async () => {
-    try {
-      const response = await fetch('/template/employeeTemplete.xlsx');
-      const arrayBuffer = await response.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-  
-      // 写入员工信息到指定单元格
-      worksheet['F12'].v = formData.name; // 员工名字
-      worksheet['F13'].v = formData.id; // 员工ID
-      worksheet['F14'].v = formData.class; // 员工Class
-      worksheet['F15'].v = formData.title; // 员工Title
-      worksheet['F16'].v = formData.gender; // 员工性别
-      worksheet['F17'].v = formData.email; // 员工邮箱
-      worksheet['F18'].v = formData.cell; // 员工电话
-      worksheet['F19'].v = formData.address; // 员工地址
-      worksheet['F20'].v = formData.lastOnlineDate; // 最后在线日期
-      worksheet['F21'].v = `${formData.thisMonthWorkDuration.hours} hours ${formData.thisMonthWorkDuration.minutes} mins`; // 本月工作时长
-      worksheet['F22'].v = `${formData.twoWeeksWorkDuration.hours} hours ${formData.twoWeeksWorkDuration.minutes} mins`; // 两周工作时长
-      worksheet['F23'].v = `${formData.workDurationToday.hours} hours ${formData.workDurationToday.minutes} mins`; // 今天工作时长
-      worksheet['F24'].v = `${formData.totalWorkDuration.hours} hours ${formData.totalWorkDuration.minutes} mins`; // 总工作时长
-      worksheet['F25'].v = `${formData.lastMonthWorkDuration.hours} hours ${formData.lastMonthWorkDuration.minutes} mins`; // 上个月工作时长
-  
-      const updatedExcelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const data = new Blob([updatedExcelBuffer], { type: 'application/octet-stream' });
-      saveAs(data, `${formData.name}_info.xlsx`);
-    } catch (error) {
-      console.error('Error exporting employee information: ', error);
-      alert('Error exporting employee information.');
-    }
-  };
-  
-
   return (
     <div className={styles.register}>
-      <div className={styles.header}>
       <h2 className={styles.editTitle}>Edit Employee</h2>
-        <button onClick={handleExport} className={styles.exportButton}>Export This Employee</button>
-      </div>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="id">ID</label>
@@ -267,12 +267,23 @@ function Edit({ employee, onCancel }) {
           {Object.keys(formData.workHours).map(day => (
             <div key={day} className={styles.workHoursRow}>
               <label>{day}</label>
-              <input type="time" name={`${day}.start`} value={formData.workHours[day].start} onChange={handleChange} className={styles.inputTime} />
+              <input type="time" name={`${day}.start`} value={formData.workHours[day].start} onChange={handleChange} className={styles.inputWorkHours} />
               <span>to</span>
-              <input type="time" name={`${day}.end`} value={formData.workHours[day].end} onChange={handleChange} className={styles.inputTime} />
+              <input type="time" name={`${day}.end`} value={formData.workHours[day].end} onChange={handleChange} className={styles.inputWorkHours} />
             </div>
           ))}
         </div>
+
+        <div className={styles.formGroup}>
+  <label htmlFor="selectedDateWorkDuration.hours">Work Duration for Selected Date</label>
+  <div className={styles.durationFields}>
+    <input type="date" name="selectedDate" placeholder="Selected Date" value={selectedDate} onChange={handleDateChange} className={styles.input} />
+    <input type="number" name="selectedDateWorkDuration.hours" placeholder="Hours" value={selectedDateWorkDuration.hours} onChange={handleChange} className={styles.inputTime} />
+    <span>hours</span>
+    <input type="number" name="selectedDateWorkDuration.minutes" placeholder="Minutes" value={selectedDateWorkDuration.minutes} onChange={handleChange} className={styles.inputTime} />
+    <span>mins</span>
+  </div>
+</div>
 
 
         <div className={styles.formGroup}>
@@ -280,7 +291,7 @@ function Edit({ employee, onCancel }) {
           <input type="date" name="lastOnlineDate" placeholder="Last Online Date" value={formData.lastOnlineDate} onChange={handleChange} className={styles.input} />
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="lastMonthWorkDuration.hours">Last Month Work Duration (Hours and Minutes)</label>
+          <label htmlFor="lastMonthWorkDuration.hours">Last Month Work Duration</label>
           <div className={styles.durationFields}>
             <input type="number" name="lastMonthWorkDuration.hours" placeholder="Hours" value={formData.lastMonthWorkDuration.hours} onChange={handleChange} className={styles.input} />
             <span>hours</span>
@@ -289,7 +300,7 @@ function Edit({ employee, onCancel }) {
           </div>
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="thisMonthWorkDuration.hours">This Month Work Duration (Hours and Minutes)</label>
+          <label htmlFor="thisMonthWorkDuration.hours">This Month Work Duration</label>
           <div className={styles.durationFields}>
             <input type="number" name="thisMonthWorkDuration.hours" placeholder="Hours" value={formData.thisMonthWorkDuration.hours} onChange={handleChange} className={styles.input} />
             <span>hours</span>
@@ -298,7 +309,7 @@ function Edit({ employee, onCancel }) {
           </div>
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="twoWeeksWorkDuration.hours">Two Weeks Work Duration (Hours and Minutes)</label>
+          <label htmlFor="twoWeeksWorkDuration.hours">Two Weeks Work Duration</label>
           <div className={styles.durationFields}>
             <input type="number" name="twoWeeksWorkDuration.hours" placeholder="Hours" value={formData.twoWeeksWorkDuration.hours} onChange={handleChange} className={styles.input} />
             <span>hours</span>
@@ -307,7 +318,7 @@ function Edit({ employee, onCancel }) {
           </div>
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="workDurationToday.hours">Work Duration Today (Hours and Minutes)</label>
+          <label htmlFor="workDurationToday.hours">Work Duration Today</label>
           <div className={styles.durationFields}>
             <input type="number" name="workDurationToday.hours" placeholder="Hours" value={formData.workDurationToday.hours} onChange={handleChange} className={styles.input} />
             <span>hours</span>
@@ -316,7 +327,7 @@ function Edit({ employee, onCancel }) {
           </div>
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="totalWorkDuration.hours">Total Work Duration (Hours and Minutes)</label>
+          <label htmlFor="totalWorkDuration.hours">Total Work Duration</label>
           <div className={styles.durationFields}>
             <input type="number" name="totalWorkDuration.hours" placeholder="Hours" value={formData.totalWorkDuration.hours} onChange={handleChange} className={styles.input} />
             <span>hours</span>

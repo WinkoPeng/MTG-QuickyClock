@@ -164,9 +164,9 @@ function Register() {
           {Object.keys(formData.workHours).map(day => (
             <div key={day} className={styles.workHoursRow}>
               <label>{day}</label>
-              <input type="time" name={`${day}.start`} value={formData.workHours[day].start} onChange={handleChange} className={styles.inputTime} />
+              <input type="time" name={`${day}.start`} value={formData.workHours[day].start} onChange={handleChange} className={styles.inputWorkHours} />
               <span>to</span>
-              <input type="time" name={`${day}.end`} value={formData.workHours[day].end} onChange={handleChange} className={styles.inputTime} />
+              <input type="time" name={`${day}.end`} value={formData.workHours[day].end} onChange={handleChange} className={styles.inputWorkHours} />
             </div>
           ))}
         </div>

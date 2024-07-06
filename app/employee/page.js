@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { DateTime } from 'luxon';
-import { query, where, getDocs, collection } from 'firebase/firestore';
+import { query, where, getDocs, collection, doc, updateDoc } from 'firebase/firestore';
 import db from '../firebase';
 
 import styles from './employee.module.css';
@@ -34,6 +34,11 @@ const Employee = () => {
   const addLog = useCallback((message) => {
     setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
   }, [currentTime]);
+
+  const handleAutoLogout = useCallback(() => {
+    router.push('/');
+    return 600;
+  }, [router]);
 
   useEffect(() => {
     const storedUserName = localStorage.getItem('userName');
@@ -82,12 +87,7 @@ const Employee = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
-
-  const handleAutoLogout = () => {
-    router.push('/');
-    return 600;
-  };
+  }, [handleAutoLogout]);
 
   const handleBreakTimeChange = (event) => {
     setBreakTime(event.target.value);
@@ -239,7 +239,6 @@ const Employee = () => {
       {showPasswordModal && (
         <div className={styles.passwordModal}>
           <div className={styles.passwordModalContent}>
-            <h2>Change Password</h2>
             <form onSubmit={handlePasswordChange}>
               <div className={styles.formGroup}>
                 <label>Current Password:</label>

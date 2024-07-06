@@ -1,3 +1,5 @@
+// page.js
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,12 +9,12 @@ import styles from './admin.module.css';
 import { Register } from './register';
 import EmployeeList from './employeeList';
 import Dashboard from './dashboard';
-import Edit from './edit'; // Import the Edit component
+import Edit from './edit';
 
 function Admin() {
   const [selectedPage, setSelectedPage] = useState('Dashboard');
   const [adminName, setAdminName] = useState('');
-  const [selectedEmployee, setSelectedEmployee] = useState(null); // State to store selected employee
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -55,10 +57,13 @@ function Admin() {
           <div className={styles.sidebarItem} onClick={() => setSelectedPage('Register')}>Register</div>
         </div>
         <div className={styles.logout}>
-          <button onClick={handleLogout} className={styles.logout}>Logout</button>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
       <div className={styles.main}>
+        <div className={styles.dashboardHeader}>
+          <h1>Admin</h1>
+        </div>
         {renderPage()}
       </div>
     </div>
