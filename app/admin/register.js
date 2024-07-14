@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import db from "../firebase";
 import styles from "./admin.module.css";
-import Geofence from "./geofence";
 
 function Register() {
   const [options, setOptions] = useState([]);
