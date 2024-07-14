@@ -1,50 +1,68 @@
-import { useState } from 'react';
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
-import db from '../firebase';
-import styles from './admin.module.css';
+import { useState, useEffect } from "react";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import db from "../firebase";
+import styles from "./admin.module.css";
+import Geofence from "./geofence";
 
 function Register() {
+  const [options, setOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchGeofences = async () => {
+      const q = query(collection(db, "geofence"));
+      const querySnapshot = await getDocs(q);
+      const geofences = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setOptions(geofences);
+    };
+    fetchGeofences();
+  }, []);
+
   const [formData, setFormData] = useState({
-    id: '',
-    password: '',
-    name: '',
-    class: 'employee',
-    title: 'Administrative Officer', // Add title field
-    gender: 'male',
-    email: '',
-    cell: '',
-    address: '',
+    id: "",
+    password: "",
+    name: "",
+    class: "employee",
+    title: "Administrative Officer", // Add title field
+    gender: "male",
+    email: "",
+    cell: "",
+    address: "",
     workHours: {
-      Monday: { start: '', end: '' },
-      Tuesday: { start: '', end: '' },
-      Wednesday: { start: '', end: '' },
-      Thursday: { start: '', end: '' },
-      Friday: { start: '', end: '' },
-      Saturday: { start: '', end: '' },
-      Sunday: { start: '', end: '' }
+      Monday: { start: "", end: "" },
+      Tuesday: { start: "", end: "" },
+      Wednesday: { start: "", end: "" },
+      Thursday: { start: "", end: "" },
+      Friday: { start: "", end: "" },
+      Saturday: { start: "", end: "" },
+      Sunday: { start: "", end: "" },
     },
-    workPeriod: [] // Add workPeriod field
+    workPeriod: [],
+    geofence: null,
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('.start') || name.includes('.end')) {
-      const [day, timeType] = name.split('.');
+    if (name.includes(".start") || name.includes(".end")) {
+      const [day, timeType] = name.split(".");
       setFormData((prevData) => ({
         ...prevData,
         workHours: {
           ...prevData.workHours,
           [day]: {
             ...prevData.workHours[day],
-            [timeType]: value
-          }
-        }
+            [timeType]: value,
+          },
+        },
       }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
-        [name]: value
+        [name]: value,
       }));
+      console.log(formData);
     }
   };
 
@@ -57,7 +75,11 @@ function Register() {
     for (let day in formData.workHours) {
       const start = formData.workHours[day].start;
       const end = formData.workHours[day].end;
-      if (start && end && new Date(`1970-01-01T${end}`) < new Date(`1970-01-01T${start}`)) {
+      if (
+        start &&
+        end &&
+        new Date(`1970-01-01T${end}`) < new Date(`1970-01-01T${start}`)
+      ) {
         alert(`${day}: End time cannot be earlier than start time.`);
         return false;
       }
@@ -66,17 +88,23 @@ function Register() {
   };
 
   const checkForDuplicates = async () => {
-    const idQuery = query(collection(db, 'employee'), where('id', '==', formData.id));
-    const emailQuery = query(collection(db, 'employee'), where('email', '==', formData.email));
+    const idQuery = query(
+      collection(db, "employee"),
+      where("id", "==", formData.id)
+    );
+    const emailQuery = query(
+      collection(db, "employee"),
+      where("email", "==", formData.email)
+    );
     const idSnapshot = await getDocs(idQuery);
     const emailSnapshot = await getDocs(emailQuery);
 
     if (!idSnapshot.empty) {
-      alert('Employee ID already exists');
+      alert("Employee ID already exists");
       return false;
     }
     if (!emailSnapshot.empty) {
-      alert('Email already exists');
+      alert("Email already exists");
       return false;
     }
     return true;
@@ -89,7 +117,7 @@ function Register() {
       return;
     }
     if (!validateEmail(formData.email)) {
-      alert('Invalid email format');
+      alert("Invalid email format");
       return;
     }
     if (!(await checkForDuplicates())) {
@@ -97,40 +125,46 @@ function Register() {
     }
 
     try {
-      const formattedWorkHours = Object.keys(formData.workHours).reduce((acc, day) => {
-        acc[day] = `${formData.workHours[day].start} - ${formData.workHours[day].end}`;
-        return acc;
-      }, {});
-
-      await addDoc(collection(db, 'employee'), {
-        ...formData,
-        workHours: formattedWorkHours
-      });
-      alert('Employee added successfully!');
-      setFormData({
-        id: '',
-        password: '',
-        name: '',
-        class: 'employee',
-        title: 'Administrative Officer', // Reset title field
-        gender: 'male',
-        email: '',
-        cell: '',
-        address: '',
-        workHours: {
-          Monday: { start: '', end: '' },
-          Tuesday: { start: '', end: '' },
-          Wednesday: { start: '', end: '' },
-          Thursday: { start: '', end: '' },
-          Friday: { start: '', end: '' },
-          Saturday: { start: '', end: '' },
-          Sunday: { start: '', end: '' }
+      const formattedWorkHours = Object.keys(formData.workHours).reduce(
+        (acc, day) => {
+          acc[
+            day
+          ] = `${formData.workHours[day].start} - ${formData.workHours[day].end}`;
+          return acc;
         },
-        workPeriod: [] // Reset workPeriod field
+        {}
+      );
+
+      await addDoc(collection(db, "employee"), {
+        ...formData,
+        workHours: formattedWorkHours,
+      });
+      alert("Employee added successfully!");
+      setFormData({
+        id: "",
+        password: "",
+        name: "",
+        class: "employee",
+        title: "Administrative Officer", // Reset title field
+        gender: "male",
+        email: "",
+        cell: "",
+        address: "",
+        workHours: {
+          Monday: { start: "", end: "" },
+          Tuesday: { start: "", end: "" },
+          Wednesday: { start: "", end: "" },
+          Thursday: { start: "", end: "" },
+          Friday: { start: "", end: "" },
+          Saturday: { start: "", end: "" },
+          Sunday: { start: "", end: "" },
+        },
+        workPeriod: [], // Reset workPeriod field
+        geofence: "",
       });
     } catch (error) {
-      console.error('Error adding document: ', error);
-      alert('Error adding employee.');
+      console.error("Error adding document: ", error);
+      alert("Error adding employee." + error);
     }
   };
 
@@ -138,40 +172,139 @@ function Register() {
     <div className={styles.register}>
       <h2>Register Employee</h2>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="id" placeholder="ID" value={formData.id} onChange={handleChange} required className={styles.input} />
-        <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required className={styles.input} />
-        <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required className={styles.input} />
-        <select name="class" value={formData.class} onChange={handleChange} required className={styles.input}>
+        <input
+          type="text"
+          name="id"
+          placeholder="ID"
+          value={formData.id}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        />
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        />
+        <select
+          name="class"
+          value={formData.class}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        >
           <option value="employee">Employee</option>
           <option value="admin">Admin</option>
         </select>
-        <select name="title" value={formData.title} onChange={handleChange} required className={styles.input}>
+        <select
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        >
           <option value="Administrative Officer">Administrative Officer</option>
           <option value="Program Coordinator">Program Coordinator</option>
           <option value="Instructor">Instructor</option>
           <option value="Receptionist">Receptionist</option>
         </select>
-        <select name="gender" value={formData.gender} onChange={handleChange} required className={styles.input}>
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        >
           <option value="male">Male</option>
           <option value="female">Female</option>
         </select>
-        <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required className={styles.input} />
-        <input type="text" name="cell" placeholder="Cell" value={formData.cell} onChange={handleChange} required className={styles.input} />
-        <input type="text" name="address" placeholder="Address" value={formData.address} onChange={handleChange} required className={styles.input} />
-        
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        />
+        <input
+          type="text"
+          name="cell"
+          placeholder="Cell"
+          value={formData.cell}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        />
+        <input
+          type="text"
+          name="address"
+          placeholder="Address"
+          value={formData.address}
+          onChange={handleChange}
+          required
+          className={styles.input}
+        />
+
         <div className={styles.workHours}>
           <h3>Work Hours</h3>
-          {Object.keys(formData.workHours).map(day => (
+          {Object.keys(formData.workHours).map((day) => (
             <div key={day} className={styles.workHoursRow}>
               <label>{day}</label>
-              <input type="time" name={`${day}.start`} value={formData.workHours[day].start} onChange={handleChange} className={styles.inputWorkHours} />
+              <input
+                type="time"
+                name={`${day}.start`}
+                value={formData.workHours[day].start}
+                onChange={handleChange}
+                className={styles.inputWorkHours}
+              />
               <span>to</span>
-              <input type="time" name={`${day}.end`} value={formData.workHours[day].end} onChange={handleChange} className={styles.inputWorkHours} />
+              <input
+                type="time"
+                name={`${day}.end`}
+                value={formData.workHours[day].end}
+                onChange={handleChange}
+                className={styles.inputWorkHours}
+              />
             </div>
           ))}
+          Employees will not be able to clock in unless they are within 1km of
+          the selected geofence location.
+          <select
+            name="geofence"
+            id="geofence-select"
+            value={formData.geofence}
+            onChange={handleChange}
+            required
+          >
+            <option value="" selected disabled>
+              Select a geofence location
+            </option>
+            <option value={null}>None</option>
+            {options.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <button type="submit" className={styles.button}>Register</button>
+        <button type="submit" className={styles.button}>
+          Register
+        </button>
       </form>
     </div>
   );

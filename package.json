@@ -9,14 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mapbox/search-js-react": "^1.0.0-beta.21",
+    "@turf/turf": "^7.0.0",
     "chart.js": "^4.4.3",
     "file-saver": "^2.0.5",
-    "firebase": "^10.12.0",
+    "firebase": "^10.12.3",
     "luxon": "^3.4.4",
+    "mapbox-gl": "^3.5.1",
     "next": "14.2.3",
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
+    "react-map-gl": "^7.1.7",
     "sharp": "^0.33.4",
     "xlsx": "^0.18.5"
   },
