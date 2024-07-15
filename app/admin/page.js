@@ -46,6 +46,7 @@ function Admin() {
 
   return (
     <div className={styles.container}>
+      <title>MTG - Admin</title>
       <div className={styles.sidebar}>
         <div className={styles.welcome}>
           <h3>Welcome,</h3>

@@ -39,77 +39,94 @@ function EmployeeList({ onEdit }) {
     setEndDate(e.target.value);
   };
 
-  const formatWorkDuration = (duration) => {
-    if (duration === 0) {
-      return '';
-    }
-    const hours = Math.floor(duration / 60);
-    const minutes = duration % 60;
-    return `${hours} h ${minutes} m`;
-  };
-
   const handleExport = () => {
     if (!startDate || !endDate || DateTime.fromISO(startDate) > DateTime.fromISO(endDate)) {
       alert('Please select a valid start and end date.');
       return;
     }
-
+  
     const startDateTime = DateTime.fromISO(startDate).startOf('day');
     const endDateTime = DateTime.fromISO(endDate).endOf('day');
     const dateRange = [];
-
+  
     for (let date = startDateTime; date <= endDateTime; date = date.plus({ days: 1 })) {
       dateRange.push(date.toISODate());
     }
-
+  
     const exportData = employees.map(employee => {
       const workPeriod = employee.workPeriod || {};
-      const filteredWorkPeriod = dateRange.reduce((obj, date) => {
-        obj[date] = workPeriod[date] || 0;
-        return obj;
-      }, {});
-
-      const totalDuration = Object.values(filteredWorkPeriod).reduce((sum, duration) => sum + duration, 0);
-
-      const dailyDurations = Object.keys(filteredWorkPeriod).map(date => {
-        const duration = filteredWorkPeriod[date];
-        return formatWorkDuration(duration);
+      const workTime = employee.workTime || {};
+      const dailyDurations = dateRange.map(date => {
+        const workEntry = workTime[date] ? workTime[date] : 'N/A';
+        const duration = workPeriod[date] ? workPeriod[date] : 0;
+        return {
+          date,
+          workEntry,
+          duration
+        };
       });
-
-      const totalHours = Math.floor(totalDuration / 60);
-      const totalMinutes = totalDuration % 60;
-      const formattedTotal = `${totalHours} h ${totalMinutes} m`;
-
+  
+      const totalDuration = dailyDurations.reduce((sum, { duration }) => sum + duration, 0);
+      const formattedTotal = formatWorkDuration(totalDuration);
+  
       return {
         ID: employee.id,
         Name: employee.name,
-        Title: employee.title,
-        ...Object.fromEntries(dateRange.map((date, index) => [date, dailyDurations[index]])),
+        dailyDurations,
         Total: formattedTotal
       };
     });
-
-    const headers = ['ID', 'Name', 'Title', ...dateRange, 'Total'];
-    const worksheet = XLSX.utils.json_to_sheet(exportData, { header: headers });
-
+  
+    const headers = ['ID', 'Name', ...dateRange, 'Total'];
+    const worksheetData = [headers];
+  
+    exportData.forEach(employee => {
+      const row1 = [employee.ID, employee.Name];
+      const row2 = ['', ''];
+      const row3 = ['', ''];
+  
+      employee.dailyDurations.forEach(({ date, workEntry, duration }) => {
+        row1.push(date);
+        row2.push(workEntry);
+        row3.push(formatWorkDuration(duration));
+      });
+  
+      row1.push('');
+      row2.push('');
+      row3.push(employee.Total);
+  
+      worksheetData.push(row1);
+      worksheetData.push(row2);
+      worksheetData.push(row3);
+      worksheetData.push([]); // Add an empty row between employees
+    });
+  
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+  
     // Set column widths
     const colWidths = [
       { wpx: 50 },  // ID column
       { wpx: 110 },  // Name column
-      { wpx: 119 },  // Title column
-      ...dateRange.map(() => ({ wpx: 79 })),  // Date columns
-      { wpx: 79 }  // Total column
+      ...dateRange.map(() => ({ wpx: 150 })),  // Date & Duration columns
+      { wpx: 100 }   // Total column
     ];
     worksheet['!cols'] = colWidths;
-
+  
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Employees');
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(data, 'employees.xlsx');
   };
-
-  const getToday = () => {
+  
+  const formatWorkDuration = (duration) => {
+    const hours = (duration / 60).toFixed(1);
+    return `${hours}h`;
+  };
+  
+  
+  
+    const getToday = () => {
     const today = DateTime.now().setZone('America/Edmonton').toFormat('cccc');
     return today;
   };
@@ -130,6 +147,16 @@ function EmployeeList({ onEdit }) {
 
     return matchesSearch && matchesFilter;
   });
+
+  const getLast7Days = () => {
+    const last7Days = [];
+    for (let i = 6; i >= 0; i--) {
+      last7Days.push(DateTime.now().minus({ days: i }).toISODate());
+    }
+    return last7Days;
+  };
+
+  const last7Days = getLast7Days();
 
   return (
     <div className={styles.content}>
@@ -156,7 +183,42 @@ function EmployeeList({ onEdit }) {
           </div>
         ))}
       </div>
+      <div className={styles.tableContainer}>
+        <table className={styles.workTable}>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Title</th>
+              {last7Days.map(date => (
+                <th key={date}>{date}</th>
+              ))}
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredEmployees.map(employee => {
+              const totalLast7Days = last7Days.reduce((sum, date) => {
+                return sum + ((employee.workPeriod && employee.workPeriod[date]) || 0);
+              }, 0);
+
+              return (
+                <tr key={employee.id}>
+                  <td>{employee.id}</td>
+                  <td>{employee.name}</td>
+                  <td>{employee.title}</td>
+                  {last7Days.map(date => (
+                    <td key={date}>{formatWorkDuration((employee.workPeriod && employee.workPeriod[date]) || 0)}</td>
+                  ))}
+                  <td>{formatWorkDuration(totalLast7Days)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
+
 export default EmployeeList;

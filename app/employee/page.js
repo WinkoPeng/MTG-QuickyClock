@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
@@ -30,6 +30,7 @@ const Employee = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [workDurationToday, setWorkDurationToday] = useState(0); // 新增状态
 
   const addLog = useCallback((message) => {
     setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
@@ -61,7 +62,7 @@ const Employee = () => {
 
           if (employeeData.status === 'online') {
             setIsClockedIn(true);
-            updateWorkDuration(storedUserId); // Continue updating work duration if user is online
+            updateWorkDuration(storedUserId, setWorkDurationToday); // 继续更新工作时长
           } else {
             setIsClockedIn(false);
           }
@@ -161,14 +162,16 @@ const Employee = () => {
 
   return (
     <div className={styles.container}>
+      <title>MTG - Employee</title>
       <div className={styles.formContainer}>
         <h1>{greeting}, {userName}!</h1>
         <div className={styles.currentTime}>Current Time: {currentTime}</div>
         <div className={styles.currentTime}>Auto Logout In: {Math.floor(autoLogoutTime / 60)}:{String(autoLogoutTime % 60).padStart(2, '0')}</div>
+        <div className={styles.currentTime}>Today's Work Duration: {formatWorkDuration(workDurationToday)}</div>
         <div className={styles.buttonAndBreakGroup}>
           <div className={styles.buttonGroup}>
-            <button className={`${styles.clockInButton} ${isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockIn(userId, setClockInTime, setIsClockedIn, addLog)} disabled={isClockedIn}>Clock In</button>
-            <button className={`${styles.clockOutButton} ${!isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockOut(userId, setIsClockedIn, setTotalBreakDuration, addLog, clockInTime, totalBreakDuration, isOnBreak, breakTimer, setIsOnBreak)} disabled={!isClockedIn}>Clock Out</button>
+            <button className={`${styles.clockInButton} ${isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockIn(userId, setClockInTime, setIsClockedIn, addLog, setWorkDurationToday)} disabled={isClockedIn}>Clock In</button>
+            <button className={`${styles.clockOutButton} ${!isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockOut(userId, setIsClockedIn, addLog, setWorkDurationToday)} disabled={!isClockedIn}>Clock Out</button>
             <button className={styles.changePasswordButton} onClick={() => setShowPasswordModal(true)}>Change Password</button>
           </div>
           <div className={styles.breakGroup}>
@@ -265,3 +268,12 @@ const Employee = () => {
 };
 
 export default withAuth(Employee);
+
+const formatWorkDuration = (duration) => {
+  if (duration === 0) {
+    return '0 h 0 m';
+  }
+  const hours = Math.floor(duration / 60);
+  const minutes = duration % 60;
+  return `${hours} h ${minutes} m`;
+};
