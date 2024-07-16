@@ -25,7 +25,7 @@ function Dashboard() {
   const fetchEmployeeData = useCallback(async () => {
     const querySnapshot = await getDocs(collection(db, 'employee'));
     const employees = querySnapshot.docs.map(doc => doc.data());
-
+  
     const today = DateTime.now();
     const startDate = today.minus({ days: 6 }).startOf('day');
     const endDate = today.endOf('day');
@@ -33,37 +33,25 @@ function Dashboard() {
     for (let date = startDate; date <= endDate; date = date.plus({ days: 1 })) {
       dateRange.push(date.toFormat('yyyy-MM-dd'));
     }
-
+  
     const employeesWorkingToday = employees.filter(emp => {
       const workHours = emp.workHours && emp.workHours[today.weekdayLong];
       return workHours && workHours !== ' - ';
     });
-
+  
     const onlineEmployees = employeesWorkingToday.filter(emp => emp.status === 'online');
-
+  
     const totalWorkHoursInMinutes = employees.reduce((acc, emp) => acc + (emp.workDurationToday || 0), 0);
     const avgWorkHoursInMinutes = totalWorkHoursInMinutes / employees.length;
     const avgHours = Math.floor(avgWorkHoursInMinutes / 60);
     const avgMinutes = Math.floor(avgWorkHoursInMinutes % 60);
-
-    const currentMonth = today.month;
-    const monthlyData = employees.map(emp => {
-      const workPeriod = emp.workPeriod || {};
-      const monthlyWorkHours = Object.keys(workPeriod).reduce((acc, date) => {
-        if (DateTime.fromISO(date).month === currentMonth) {
-          acc += workPeriod[date];
-        }
-        return acc;
-      }, 0);
-      return { name: emp.name, monthlyWorkHours };
-    });
-
+  
     const weeklyData = employees.map(emp => {
       const workPeriod = emp.workPeriod || {};
-      const workHours = dateRange.map(date => workPeriod[date] || 0);
+      const workHours = dateRange.map(date => (workPeriod[date] || 0) / 60);
       return { name: emp.name, workHours };
     });
-
+  
     setEmployeeData(employees);
     setFilteredEmployeeData(employees); // 初始化显示所有员工
     setWorkingTodayCount(employeesWorkingToday.length);
@@ -73,6 +61,7 @@ function Dashboard() {
     setAverageWorkHours({ hours: avgHours, minutes: avgMinutes });
     setWeeklyWorkHours(weeklyData);
   }, []);
+  
 
   useEffect(() => {
     fetchEmployeeData();
@@ -207,7 +196,7 @@ function Dashboard() {
                 <td>{row.title}</td>
                 <td>{row.status}</td>
                 <td>{row.lastOnlineDate}</td>
-                <td>{(row.totalWorkDuration / 60).toFixed(2)}</td>
+                <td>{(row.thisMonthWorkDuration / 60).toFixed(1)}h</td> {/* 显示本月工作小时 */}
               </tr>
             ))}
           </tbody>
@@ -215,6 +204,7 @@ function Dashboard() {
       </div>
     </div>
   );
+  
 }
 
 export default Dashboard;

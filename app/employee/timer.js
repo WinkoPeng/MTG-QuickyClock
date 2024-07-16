@@ -86,24 +86,20 @@ const updateWorkDuration = async (userId, setWorkDurationToday) => {
       const now = DateTime.now().setZone('America/Edmonton');
       const today = now.toISODate();
       const clockInEntry = userData.workTime[today];
-      const startTime = DateTime.fromISO(clockInEntry.split(' - ')[0]);
-      const workDurationToday = Math.round(now.diff(startTime, 'minutes').minutes - (userData.totalBreakDuration || 0));
+      const startTime = DateTime.fromISO(clockInEntry.split(' - ')[0], { zone: 'America/Edmonton' });
+      const totalBreakDuration = userData.totalBreakDuration || 0;
+      let workDurationToday = Math.round(now.diff(startTime, 'minutes').minutes - totalBreakDuration);
+
+      if (workDurationToday < 0) {
+        workDurationToday = 0;
+      }
 
       setWorkDurationToday(workDurationToday);
 
       const updatedWorkPeriod = { ...userData.workPeriod, [today]: workDurationToday };
 
-      const totalWorkDuration = (userData.totalWorkDuration || 0) + workDurationToday;
-      const thisMonthWorkDuration = calculateThisMonthWorkDuration(updatedWorkPeriod);
-      const twoWeeksWorkDuration = calculateTwoWeeksWorkDuration(updatedWorkPeriod);
-      const lastMonthWorkDuration = calculateLastMonthWorkDuration(updatedWorkPeriod);
-
       await updateDoc(userRef, {
         workDurationToday,
-        totalWorkDuration,
-        twoWeeksWorkDuration,
-        thisMonthWorkDuration,
-        lastMonthWorkDuration,
         workPeriod: updatedWorkPeriod
       });
 
@@ -168,7 +164,7 @@ const handleClockIn = async (userId, setClockInTime, setIsClockedIn, addLog, set
   }
 };
 
-const handleClockOut = async (userId, setIsClockedIn, addLog, setWorkDurationToday) => {
+const handleClockOut = async (userId, setIsClockedIn, addLog, setWorkDurationToday, setIsOnBreak) => {
   setIsClockedIn(false);
 
   const now = DateTime.now().setZone('America/Edmonton');
@@ -185,14 +181,20 @@ const handleClockOut = async (userId, setIsClockedIn, addLog, setWorkDurationTod
 
       const today = now.toISODate();
       const clockInEntry = userData.workTime[today];
-      const startTime = DateTime.fromISO(`${today}T${clockInEntry}`, { zone: 'America/Edmonton' });
-      const totalWorkDurationToday = Math.round(now.diff(startTime, 'minutes').minutes - (userData.totalBreakDuration || 0));
+      const startTime = DateTime.fromISO(clockInEntry, { zone: 'America/Edmonton' });
+      let totalWorkDurationToday = Math.round(now.diff(startTime, 'minutes').minutes - (userData.totalBreakDuration || 0));
+
+      // 确保工作时长不为负数
+      if (totalWorkDurationToday < 0) {
+        totalWorkDurationToday = 0;
+      }
 
       const updatedWorkPeriod = { ...userData.workPeriod, [today]: totalWorkDurationToday };
       const updatedWorkTime = { ...userData.workTime, [today]: `${clockInEntry} - ${clockOutTime.toFormat('HH:mm')}` };
 
       await updateDoc(userRef, {
         status: 'offline',
+        lastOnlineDate: today, // 仅保存日期
         isOnBreak: false,
         workDurationToday: totalWorkDurationToday,
         workPeriod: updatedWorkPeriod,
@@ -201,6 +203,7 @@ const handleClockOut = async (userId, setIsClockedIn, addLog, setWorkDurationTod
 
       console.log('User status set to offline and work duration updated.');
       setWorkDurationToday(totalWorkDurationToday);
+      setIsOnBreak(false); // 恢复休息按钮
     } else {
       console.log(`User document does not exist for ID: ${userId}`);
     }
@@ -208,6 +211,9 @@ const handleClockOut = async (userId, setIsClockedIn, addLog, setWorkDurationTod
     console.error('Error clocking out:', error);
   }
 };
+
+
+
 
 
 const handleStartBreak = async (userId, setIsOnBreak, setBreakTimer, breakDuration, addLog) => {
@@ -220,8 +226,11 @@ const handleStartBreak = async (userId, setIsOnBreak, setBreakTimer, breakDurati
     const userDoc = querySnapshot.docs[0];
     const userRef = doc(db, 'employee', userDoc.id);
 
+    const totalBreakDuration = (userDoc.data().totalBreakDuration || 0) + parseInt(breakDuration);
+
     await updateDoc(userRef, {
-      isOnBreak: true
+      isOnBreak: true,
+      totalBreakDuration
     });
 
     setBreakTimer(
@@ -237,13 +246,19 @@ const handleStartBreak = async (userId, setIsOnBreak, setBreakTimer, breakDurati
   }
 };
 
+const formatWorkDuration = (duration) => {
+  if (duration === 0) {
+    return '0 h 0 m';
+  }
+  const hours = Math.floor(duration / 60);
+  const minutes = duration % 60;
+  return `${hours} h ${minutes} m`;
+};
+
 export {
-  startInterval,
-  calculateLastMonthWorkDuration,
-  calculateTwoWeeksWorkDuration,
-  calculateThisMonthWorkDuration,
-  updateWorkDuration,
   handleClockIn,
   handleClockOut,
-  handleStartBreak
+  handleStartBreak,
+  updateWorkDuration,
+  formatWorkDuration
 };

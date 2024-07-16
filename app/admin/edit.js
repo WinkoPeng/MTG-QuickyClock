@@ -38,6 +38,7 @@ function Edit({ employee, onCancel }) {
 
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDateWorkDuration, setSelectedDateWorkDuration] = useState({ hours: 0, minutes: 0 });
+  const [selectedDateWorkTime, setSelectedDateWorkTime] = useState('');
 
   useEffect(() => {
     if (employee) {
@@ -49,6 +50,7 @@ function Edit({ employee, onCancel }) {
         totalWorkDuration,
         workHours,
         workPeriod,
+        workTime,
         ...rest
       } = employee;
 
@@ -62,9 +64,14 @@ function Edit({ employee, onCancel }) {
         totalWorkDuration: convertMinutesToHoursAndMinutes(totalWorkDuration)
       });
 
-      // Set selected date work duration if workPeriod is available
       if (workPeriod && selectedDate && workPeriod[selectedDate]) {
         setSelectedDateWorkDuration(convertMinutesToHoursAndMinutes(workPeriod[selectedDate]));
+      }
+
+      if (workTime && selectedDate && workTime[selectedDate]) {
+        setSelectedDateWorkTime(workTime[selectedDate]);
+      } else {
+        setSelectedDateWorkTime('');
       }
     }
   }, [employee, selectedDate]);
@@ -133,24 +140,33 @@ function Edit({ employee, onCancel }) {
     } else {
       setSelectedDateWorkDuration({ hours: 0, minutes: 0 });
     }
+
+    if (employee.workTime && employee.workTime[e.target.value]) {
+      setSelectedDateWorkTime(employee.workTime[e.target.value]);
+    } else {
+      setSelectedDateWorkTime('');
+    }
   };
-  
+
+  const handleWorkTimeChange = (e) => {
+    setSelectedDateWorkTime(e.target.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const employeeQuery = query(collection(db, 'employee'), where('id', '==', formData.id));
       const querySnapshot = await getDocs(employeeQuery);
-  
+
       if (querySnapshot.empty) {
         alert('Employee ID does not exist');
         return;
       }
-  
+
       const employeeDoc = querySnapshot.docs[0];
       const docRef = doc(db, 'employee', employeeDoc.id);
-  
+
       const updatedFormData = {
         ...formData,
         lastMonthWorkDuration: convertHoursAndMinutesToMinutes(formData.lastMonthWorkDuration),
@@ -161,20 +177,17 @@ function Edit({ employee, onCancel }) {
         workHours: Object.keys(formData.workHours).reduce((acc, day) => {
           acc[day] = `${formData.workHours[day].start} - ${formData.workHours[day].end}` || '- -';
           return acc;
-        }, {})
-      };
-  
-      if (selectedDate && (selectedDateWorkDuration.hours > 0 || selectedDateWorkDuration.minutes > 0)) {
-        updatedFormData.workPeriod = {
+        }, {}),
+        workPeriod: {
           ...employee.workPeriod,
           [selectedDate]: convertHoursAndMinutesToMinutes(selectedDateWorkDuration)
-        };
-      } else {
-        updatedFormData.workPeriod = {
-          ...employee.workPeriod
-        };
-      }
-  
+        },
+        workTime: {
+          ...employee.workTime,
+          [selectedDate]: selectedDateWorkTime
+        }
+      };
+
       await updateDoc(docRef, updatedFormData);
       alert('Employee updated successfully!');
       onCancel();
@@ -183,7 +196,6 @@ function Edit({ employee, onCancel }) {
       alert('Error updating employee.');
     }
   };
-  
 
   const handleDelete = async () => {
     const confirmDelete = confirm('Are you sure you want to delete this employee?');
@@ -284,6 +296,14 @@ function Edit({ employee, onCancel }) {
     <span>mins</span>
   </div>
 </div>
+<div className={styles.formGroup}>
+<div className={styles.durationFields}>
+  <label htmlFor="selectedDateWorkTime">Start Time - End Time</label>
+  <input type="text" name="selectedDateWorkTime" placeholder="Start time & End time" value={selectedDateWorkTime} onChange={handleWorkTimeChange} className={styles.input} />
+  </div>
+</div>
+
+
 
 
         <div className={styles.formGroup}>

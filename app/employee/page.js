@@ -8,14 +8,14 @@ import db from '../firebase';
 
 import styles from './employee.module.css';
 import withAuth from '../withAuth';
-import { handleClockIn, handleClockOut, updateWorkDuration, handleStartBreak } from './timer';
+import { handleClockIn, handleClockOut, updateWorkDuration, handleStartBreak, formatWorkDuration } from './timer';
 
 const Employee = () => {
   const router = useRouter();
   const [currentTime, setCurrentTime] = useState(DateTime.now().setZone('America/Edmonton').toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS));
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState('');
-  const [breakTime, setBreakTime] = useState('');
+  const [breakTime, setBreakTime] = useState('15'); // 初始化为 15 分钟
   const [customBreakTime, setCustomBreakTime] = useState('');
   const [selectedOption, setSelectedOption] = useState('select');
   const [log, setLog] = useState([]);
@@ -76,6 +76,7 @@ const Employee = () => {
       const now = DateTime.now().setZone('America/Edmonton');
       setCurrentTime(now.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS));
       setAutoLogoutTime(prevTime => (prevTime <= 1 ? handleAutoLogout() : prevTime - 1));
+      updateWorkDuration(userId, setWorkDurationToday); // 每分钟更新工作时长
 
       const hour = now.hour;
       if (hour < 12) {
@@ -88,7 +89,7 @@ const Employee = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [handleAutoLogout]);
+  }, [handleAutoLogout, userId]);
 
   const handleBreakTimeChange = (event) => {
     setBreakTime(event.target.value);
@@ -160,6 +161,17 @@ const Employee = () => {
     router.push('/');
   };
 
+  const formatWorkDuration = (duration) => {
+    if (duration === 0) {
+      return '0 h 0 m';
+    }
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    return `${hours} h ${minutes} m`;
+  };
+  
+
+
   return (
     <div className={styles.container}>
       <title>MTG - Employee</title>
@@ -167,11 +179,11 @@ const Employee = () => {
         <h1>{greeting}, {userName}!</h1>
         <div className={styles.currentTime}>Current Time: {currentTime}</div>
         <div className={styles.currentTime}>Auto Logout In: {Math.floor(autoLogoutTime / 60)}:{String(autoLogoutTime % 60).padStart(2, '0')}</div>
-        <div className={styles.currentTime}>Today&apos;s Work Duration: {formatWorkDuration(workDurationToday)}</div>
+        <div className={styles.currentTime}>Today's Work Duration: {formatWorkDuration(workDurationToday)}</div> {/* 新增行 */}
         <div className={styles.buttonAndBreakGroup}>
           <div className={styles.buttonGroup}>
             <button className={`${styles.clockInButton} ${isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockIn(userId, setClockInTime, setIsClockedIn, addLog, setWorkDurationToday)} disabled={isClockedIn}>Clock In</button>
-            <button className={`${styles.clockOutButton} ${!isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockOut(userId, setIsClockedIn, addLog, setWorkDurationToday)} disabled={!isClockedIn}>Clock Out</button>
+            <button className={`${styles.clockOutButton} ${!isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockOut(userId, setIsClockedIn, addLog, setWorkDurationToday, setIsOnBreak)} disabled={!isClockedIn}>Clock Out</button>
             <button className={styles.changePasswordButton} onClick={() => setShowPasswordModal(true)}>Change Password</button>
           </div>
           <div className={styles.breakGroup}>
@@ -226,6 +238,7 @@ const Employee = () => {
                 <th>Message</th>
               </tr>
             </thead>
+           
             <tbody>
               {log.map((entry, index) => (
                 <tr key={index}>
@@ -269,11 +282,3 @@ const Employee = () => {
 
 export default withAuth(Employee);
 
-const formatWorkDuration = (duration) => {
-  if (duration === 0) {
-    return '0 h 0 m';
-  }
-  const hours = Math.floor(duration / 60);
-  const minutes = duration % 60;
-  return `${hours} h ${minutes} m`;
-};
