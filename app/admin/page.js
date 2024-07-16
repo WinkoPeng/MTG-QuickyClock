@@ -12,6 +12,7 @@ import Dashboard from "./dashboard";
 import Edit from "./edit";
 import GeofenceDisplay from "./geofenceDisplay";
 import GeofenceSetup from "./geofenceSetup";
+import Contact from "./contact";
 
 function Admin() {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
@@ -53,6 +54,8 @@ function Admin() {
             onCancel={() => setSelectedPage("Employee List")}
           />
         );
+      case "Messages":
+        return <Contact />;
       case "GeofenceDisplay":
         return <GeofenceDisplay />;
       case "GeofenceSetup":
@@ -87,6 +90,12 @@ function Admin() {
             onClick={() => setSelectedPage("Register")}
           >
             Register
+          </div>
+          <div
+            className={styles.sidebarItem}
+            onClick={() => setSelectedPage("Messages")}
+          >
+            Messages
           </div>
           <div
             className={styles.sidebarItem}

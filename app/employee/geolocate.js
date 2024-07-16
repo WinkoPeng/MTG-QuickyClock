@@ -69,8 +69,7 @@ const validateLocation = async (userId) => {
       units: "kilometers",
     });
 
-    // Assuming the geofence radius is 3 kilometers
-    return userDistance <= 3;
+    return userDistance <= 5;
   } catch (error) {
     console.error("Error validating location:", error);
     return false;
