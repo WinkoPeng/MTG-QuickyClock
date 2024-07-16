@@ -179,7 +179,7 @@ const Employee = () => {
         <h1>{greeting}, {userName}!</h1>
         <div className={styles.currentTime}>Current Time: {currentTime}</div>
         <div className={styles.currentTime}>Auto Logout In: {Math.floor(autoLogoutTime / 60)}:{String(autoLogoutTime % 60).padStart(2, '0')}</div>
-        <div className={styles.currentTime}>Today's Work Duration: {formatWorkDuration(workDurationToday)}</div> {/* 新增行 */}
+        <div className={styles.currentTime}>Today&apos;s Work Duration: {formatWorkDuration(workDurationToday)}</div> {/* 新增行 */}
         <div className={styles.buttonAndBreakGroup}>
           <div className={styles.buttonGroup}>
             <button className={`${styles.clockInButton} ${isClockedIn ? styles.disabledButton : ''}`} onClick={() => handleClockIn(userId, setClockInTime, setIsClockedIn, addLog, setWorkDurationToday)} disabled={isClockedIn}>Clock In</button>
