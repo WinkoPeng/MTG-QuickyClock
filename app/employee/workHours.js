@@ -16,7 +16,6 @@ const WEEKDAYS_ORDER = [
 const WorkHours = ({ employeeId }) => {
   const [workHours, setWorkHours] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchWorkHours = async () => {
@@ -29,9 +28,8 @@ const WorkHours = ({ employeeId }) => {
 
         if (!querySnapshot.empty) {
           const docData = querySnapshot.docs[0].data();
+          console.log(docData);
           setWorkHours(docData.workHours);
-        } else {
-          setError("No work hours found.");
         }
       } catch (err) {
         setError("Error fetching work hours: " + err.message);
@@ -42,9 +40,6 @@ const WorkHours = ({ employeeId }) => {
 
     fetchWorkHours();
   }, [employeeId]);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
 
   const sortedWorkHours = Object.entries(workHours).sort(
     (a, b) => WEEKDAYS_ORDER.indexOf(a[0]) - WEEKDAYS_ORDER.indexOf(b[0])
