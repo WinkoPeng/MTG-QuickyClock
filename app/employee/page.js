@@ -22,6 +22,7 @@ import {
   handleStartBreak,
 } from "./timer";
 import Contact from "./contact";
+import SentForms from "./sentForms";
 
 const Employee = () => {
   const router = useRouter();
@@ -45,6 +46,7 @@ const Employee = () => {
   const [autoLogoutTime, setAutoLogoutTime] = useState(600); // 10 minutes in seconds
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [showSentFormsModal, setSentFormsModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -305,6 +307,13 @@ const Employee = () => {
             >
               Contact Admins
             </button>
+
+            <button
+              className={styles.changePasswordButton}
+              onClick={() => setSentFormsModal(true)}
+            >
+              View Sent Contact Forms
+            </button>
           </div>
           <div className={styles.breakGroup}>
             <div className={styles.breakOption}>
@@ -413,6 +422,15 @@ const Employee = () => {
           <div className={styles.passwordModalContent}>
             <Contact userId={userId} name={userName} />
             <button onClick={() => setShowContactModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {showSentFormsModal && (
+        <div className={styles.passwordModal}>
+          <div className={styles.passwordModalContent}>
+            <SentForms userId={userId} />
+            <button onClick={() => setSentFormsModal(false)}>Close</button>
           </div>
         </div>
       )}

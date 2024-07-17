@@ -320,3 +320,33 @@
   font-size: 0.9em;
   color: #333;
 }
+
+/* Sent Forms Section */
+
+.sent-forms-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.sent-forms-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sent-form-item {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+}
+
+.sent-form-item h3 {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.sent-form-item p {
+  margin: 5px 0;
+}

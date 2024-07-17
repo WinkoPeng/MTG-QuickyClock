@@ -15,11 +15,15 @@ import GeofenceSetup from "./geofenceSetup";
 import Contact from "./contact";
 import Bulletin from "./bulletin";
 
+import { collection, query, where, getDocs } from "firebase/firestore";
+import db from "../firebase";
+
 function Admin() {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
   const [adminName, setAdminName] = useState("");
   const [userId, setUserId] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [pendingMessages, setPendingMessages] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,7 +35,18 @@ function Admin() {
     if (name) {
       setAdminName(name);
     }
+
+    fetchMessages();
   }, []);
+
+  const fetchMessages = async () => {
+    const q = query(
+      collection(db, "messages"),
+      where("status", "==", "pending")
+    );
+    const querySnapshot = await getDocs(q);
+    setPendingMessages(!querySnapshot.empty);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("adminName");
@@ -63,7 +78,7 @@ function Admin() {
       case "Bulletin":
         return <Bulletin userId={userId} userName={adminName} />;
       case "Messages":
-        return <Contact />;
+        return <Contact userName={adminName} updateMessages={fetchMessages} />;
       case "GeofenceDisplay":
         return <GeofenceDisplay />;
       case "GeofenceSetup":
@@ -106,8 +121,13 @@ function Admin() {
             Bulletin
           </div>
           <div
-            className={styles.sidebarItem}
-            onClick={() => setSelectedPage("Messages")}
+            className={`${styles.sidebarItem} ${
+              pendingMessages ? styles.blinking : ""
+            }`}
+            onClick={() => {
+              setSelectedPage("Messages");
+              setPendingMessages(false);
+            }}
           >
             Messages
           </div>

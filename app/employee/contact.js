@@ -38,7 +38,7 @@ const Contact = ({ userId, name }) => {
   return (
     <div className={styles.formGroup}>
       <form onSubmit={handleSubmit}>
-        <h2>Contact Us</h2>
+        <h2>Contact Admins</h2>
         <label htmlFor="id">ID</label>
         <input
           type="text"

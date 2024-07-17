@@ -14,7 +14,6 @@ import {
   getDocs,
 } from "firebase/firestore";
 import db from "../firebase";
-import * as turf from "@turf/turf"; // Import Turf.js
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 

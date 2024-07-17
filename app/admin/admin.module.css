@@ -40,6 +40,22 @@
   border-radius: 4px;
 }
 
+.blinking {
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0% {
+    background-color: #34495e;
+  }
+  50% {
+    background-color: #ff0000; /* Change color for blinking effect */
+  }
+  100% {
+    background-color: #34495e;
+  }
+}
+
 .sidebarItem:hover {
   background-color: #1abc9c;
 }
@@ -140,7 +156,6 @@
   margin-bottom: 10px;
   margin-top: 10px;
 }
-
 
 .register .workHoursRow {
   display: flex;
@@ -417,4 +432,3 @@
   background-color: #f8f9fa;
   overflow-y: auto;
 }
-

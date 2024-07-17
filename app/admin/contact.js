@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import db from "../firebase";
+import "./contact.css";
 
-const Contact = () => {
+const Contact = ({ userName, updateMessages }) => {
   const [contactForms, setContactForms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [adminName, setAdminName] = useState(userName);
 
   useEffect(() => {
     const fetchContactForms = async () => {
@@ -13,10 +15,14 @@ const Contact = () => {
         id: doc.id,
         ...doc.data(),
       }));
+
+      forms.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+
       setContactForms(forms);
       setLoading(false);
     };
     fetchContactForms();
+    setAdminName(userName);
   }, []);
 
   const handleUpdateStatus = async (id, newStatus) => {
@@ -29,8 +35,18 @@ const Contact = () => {
     );
   };
 
+  const handleReply = async (id, reply) => {
+    const formDoc = doc(db, "messages", id);
+    await updateDoc(formDoc, { reply: reply });
+    setContactForms(
+      contactForms.map((form) =>
+        form.id === id ? { ...form, reply: reply } : form
+      )
+    );
+  };
+
   return (
-    <div>
+    <div className="container">
       <h2>Employee Messages</h2>
       <ul>
         {contactForms.map((form) => (
@@ -40,9 +56,19 @@ const Contact = () => {
             <p>Time: {form.createdAt.toDate().toString()}</p>
             <p>Message: {form.message}</p>
             <p>Status: {form.status}</p>
-            <button onClick={() => handleUpdateStatus(form.id, "resolved")}>
-              Mark as Resolved
-            </button>
+            {form.status === "pending" && (
+              <button
+                onClick={() => {
+                  handleUpdateStatus(
+                    form.id,
+                    `Resolved by ${adminName} at ${new Date()}`
+                  );
+                  updateMessages();
+                }}
+              >
+                Mark as Resolved
+              </button>
+            )}
           </li>
         ))}
       </ul>
