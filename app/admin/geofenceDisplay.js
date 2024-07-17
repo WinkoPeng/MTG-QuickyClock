@@ -43,7 +43,6 @@ const GeofenceDisplay = () => {
             <tr>
               <th>Name</th>
               <th>Address</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>

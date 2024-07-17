@@ -1,0 +1,27 @@
+/* WorkHours.module.css */
+
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.heading {
+  margin-bottom: 20px;
+  font-size: 1.5em; /* Adjust as needed */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f4f4f4;
+}

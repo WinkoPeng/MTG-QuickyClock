@@ -129,7 +129,7 @@ function Admin() {
               setPendingMessages(false);
             }}
           >
-            Messages
+            Employee Messages
           </div>
           <div
             className={styles.sidebarItem}

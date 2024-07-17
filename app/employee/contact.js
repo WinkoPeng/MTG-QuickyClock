@@ -28,6 +28,9 @@ const Contact = ({ userId, name }) => {
         status: "pending",
         createdAt: new Date(),
       });
+      setFormData({
+        message: "",
+      });
       setStatus("Form submitted successfully.");
     } catch (error) {
       console.error("Error adding document: ", error);

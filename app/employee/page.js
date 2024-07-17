@@ -23,6 +23,7 @@ import {
 } from "./timer";
 import Contact from "./contact";
 import SentForms from "./sentForms";
+import WorkHours from "./workHours";
 
 const Employee = () => {
   const router = useRouter();
@@ -299,12 +300,6 @@ const Employee = () => {
             </button>
             <button
               className={styles.changePasswordButton}
-              onClick={() => setShowPasswordModal(true)}
-            >
-              Change Password
-            </button>
-            <button
-              className={styles.changePasswordButton}
               onClick={() => setShowContactModal(true)}
             >
               Contact Admins
@@ -315,6 +310,12 @@ const Employee = () => {
               onClick={() => setSentFormsModal(true)}
             >
               View Sent Contact Forms
+            </button>
+            <button
+              className={styles.changePasswordButton}
+              onClick={() => setShowPasswordModal(true)}
+            >
+              Change Password
             </button>
           </div>
           <div className={styles.breakGroup}>
@@ -369,6 +370,7 @@ const Employee = () => {
             </button>
           </div>
         </div>
+        <WorkHours employeeId={userId} />
         <div className={styles.log}>
           <table className={styles.logTable}>
             <thead>
