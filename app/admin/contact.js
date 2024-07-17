@@ -31,7 +31,7 @@ const Contact = () => {
 
   return (
     <div>
-      <h2>Contact Forms</h2>
+      <h2>Employee Messages</h2>
       <ul>
         {contactForms.map((form) => (
           <li key={form.id}>

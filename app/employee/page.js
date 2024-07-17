@@ -49,6 +49,10 @@ const Employee = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
+  const [bulletins, setBulletins] = useState([]);
+  const [showBulletinOverlay, setShowBulletinOverlay] = useState(false);
+  const [newestBulletin, setNewestBulletin] = useState(null);
+
   const addLog = useCallback(
     (message) => {
       setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
@@ -94,6 +98,34 @@ const Employee = () => {
     };
 
     fetchData();
+
+    const fetchBulletins = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "bulletins"));
+        const bulletinsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Sort bulletins by the 'createdAt' field in descending order
+        const sortedBulletins = bulletinsData.sort((a, b) => {
+          const dateA = a.createdAt.toDate
+            ? a.createdAt.toDate()
+            : new Date(a.createdAt);
+          const dateB = b.createdAt.toDate
+            ? b.createdAt.toDate()
+            : new Date(b.createdAt);
+          return dateB - dateA;
+        });
+
+        setBulletins(sortedBulletins);
+        setNewestBulletin(sortedBulletins[0]);
+      } catch (error) {
+        console.error("Error fetching bulletins:", error);
+      }
+    };
+
+    fetchBulletins();
 
     const timer = setInterval(() => {
       const now = DateTime.now().setZone("America/Edmonton");
@@ -197,6 +229,27 @@ const Employee = () => {
 
   return (
     <div className={styles.container}>
+      {/* Bulletin Section */}
+      {newestBulletin && (
+        <div className={styles.bulletinSection}>
+          <h2>Bulletin Board</h2>
+          <div className={styles.bulletinHeader}>
+            <h3>{newestBulletin.title}</h3>
+            <p>By: {newestBulletin.author}</p>
+            <p>
+              {new Date(newestBulletin.createdAt.toDate()).toLocaleString()}
+            </p>
+          </div>
+          <p>{newestBulletin.message}</p>
+          <button
+            className={styles.viewAllButton}
+            onClick={() => setShowBulletinOverlay(true)}
+          >
+            View All Bulletins
+          </button>
+        </div>
+      )}
+
       <div className={styles.formContainer}>
         <h1>
           {greeting}, {userName}!
@@ -250,7 +303,7 @@ const Employee = () => {
               className={styles.changePasswordButton}
               onClick={() => setShowContactModal(true)}
             >
-              Contact
+              Contact Admins
             </button>
           </div>
           <div className={styles.breakGroup}>
@@ -327,6 +380,33 @@ const Employee = () => {
           Log Out
         </button>
       </div>
+
+      {/* Bulletin Overlay */}
+      {showBulletinOverlay && (
+        <div className={styles.overlay}>
+          <div className={styles.overlayContent}>
+            <h2>All Bulletins</h2>
+            <button
+              className={styles.closeButton}
+              onClick={() => setShowBulletinOverlay(false)}
+            >
+              Close
+            </button>
+            <ul className={styles.bulletinList}>
+              {bulletins.map((bulletin) => (
+                <li key={bulletin.id} className={styles.bulletinItem}>
+                  <h3>{bulletin.title}</h3>
+                  <p>By: {bulletin.author}</p>
+                  <p>
+                    {new Date(bulletin.createdAt.toDate()).toLocaleString()}
+                  </p>
+                  <p>{bulletin.message}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       {showContactModal && (
         <div className={styles.passwordModal}>

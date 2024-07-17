@@ -1,0 +1,64 @@
+/* Container for the user bulletin board */
+.user-bulletin-board {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Header style */
+.user-bulletin-board h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* List style */
+.bulletin-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Bulletin item styling */
+.bulletin-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Bulletin header styling */
+.bulletin-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.bulletin-title {
+  font-size: 1.5em;
+  margin: 0;
+  color: #333;
+}
+
+.bulletin-author {
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* Bulletin message styling */
+.bulletin-message {
+  font-size: 1em;
+  margin: 12px 0;
+  color: #333;
+}
+
+/* Bulletin timestamp styling */
+.bulletin-timestamp {
+  font-size: 0.8em;
+  color: #888;
+}

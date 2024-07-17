@@ -1,0 +1,115 @@
+.bulletin-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.bulletin-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.bulletin-title {
+  font-size: 1.5em;
+  margin: 0;
+  color: #333;
+}
+
+.bulletin-author {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.bulletin-message {
+  font-size: 1em;
+  margin: 12px 0;
+  color: #333;
+}
+
+.bulletin-timestamp {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.bulletin-delete-button {
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  color: #fff;
+  background-color: #e74c3c;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.bulletin-delete-button:hover {
+  background-color: #c0392b;
+}
+
+/* Container for the entire admin bulletin board */
+.admin-bulletin-board {
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Header style */
+.admin-bulletin-board h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Section header style */
+.admin-bulletin-board h2 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+  color: #444;
+}
+
+/* Input field styling */
+.admin-bulletin-board input[type="text"],
+.admin-bulletin-board textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+/* Placeholder styling */
+.admin-bulletin-board input::placeholder,
+.admin-bulletin-board textarea::placeholder {
+  color: #aaa;
+}
+
+/* Button styling */
+.admin-bulletin-board button {
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-bulletin-board button:hover {
+  background-color: #0056b3;
+}
+
+.admin-bulletin-board button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

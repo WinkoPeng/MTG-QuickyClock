@@ -13,14 +13,20 @@ import Edit from "./edit";
 import GeofenceDisplay from "./geofenceDisplay";
 import GeofenceSetup from "./geofenceSetup";
 import Contact from "./contact";
+import Bulletin from "./bulletin";
 
 function Admin() {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
   const [adminName, setAdminName] = useState("");
+  const [userId, setUserId] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
     const name = localStorage.getItem("adminName");
     if (name) {
       setAdminName(name);
@@ -54,6 +60,8 @@ function Admin() {
             onCancel={() => setSelectedPage("Employee List")}
           />
         );
+      case "Bulletin":
+        return <Bulletin userId={userId} userName={adminName} />;
       case "Messages":
         return <Contact />;
       case "GeofenceDisplay":
@@ -90,6 +98,12 @@ function Admin() {
             onClick={() => setSelectedPage("Register")}
           >
             Register
+          </div>
+          <div
+            className={styles.sidebarItem}
+            onClick={() => setSelectedPage("Bulletin")}
+          >
+            Bulletin
           </div>
           <div
             className={styles.sidebarItem}

@@ -221,3 +221,102 @@
 .passwordModalButtons button[type="button"]:hover {
   background-color: darkred;
 }
+
+/* Bulletin Section */
+.bulletinSection {
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  width: 70%;
+}
+
+.bulletinHeader {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.bulletinHeader h3 {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+.bulletinHeader p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.viewAllButton {
+  margin-top: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.viewAllButton:hover {
+  background-color: #0056b3;
+}
+
+/* Overlay for Bulletins */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlayContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  width: 90%;
+}
+
+.closeButton {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  float: right;
+}
+
+.closeButton:hover {
+  background-color: #cc0000;
+}
+
+.bulletinList {
+  list-style-type: none;
+  padding: 0;
+}
+
+.bulletinItem {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.bulletinItem h3 {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.bulletinItem p {
+  margin: 5px 0;
+  font-size: 0.9em;
+  color: #333;
+}

@@ -35,6 +35,10 @@ const validateLocation = async (userId) => {
 
     const locationId = userQuerySnap.docs[0].data().geofence;
 
+    if (locationId == "None") {
+      return true;
+    }
+
     if (!locationId) {
       console.error("No geofence location ID found for the user");
       return false;
