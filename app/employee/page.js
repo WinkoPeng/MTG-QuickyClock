@@ -232,35 +232,37 @@ const Employee = () => {
   return (
     <div className={styles.container}>
       {/* Bulletin Section */}
-      {newestBulletin && (
-        <div className={styles.bulletinSection}>
-          <h2>Bulletin Board</h2>
-          <div className={styles.bulletinHeader}>
-            <h3>{newestBulletin.title}</h3>
-            <p>By: {newestBulletin.author}</p>
-            <p>
-              {new Date(newestBulletin.createdAt.toDate()).toLocaleString()}
-            </p>
-          </div>
-          <p>{newestBulletin.message}</p>
-          <button
-            className={styles.viewAllButton}
-            onClick={() => setShowBulletinOverlay(true)}
-          >
-            View All Bulletins
-          </button>
-        </div>
-      )}
 
       <div className={styles.formContainer}>
         <h1>
           {greeting}, {userName}!
         </h1>
+
         <div className={styles.currentTime}>Current Time: {currentTime}</div>
         <div className={styles.currentTime}>
           Auto Logout In: {Math.floor(autoLogoutTime / 60)}:
           {String(autoLogoutTime % 60).padStart(2, "0")}
         </div>
+        {newestBulletin && (
+          <div className={styles.bulletinSection}>
+            <h2>Bulletin Board</h2>
+            <div className={styles.bulletinHeader}>
+              <h3>{newestBulletin.title}</h3>
+              <p>By: {newestBulletin.author}</p>
+              <p>
+                {new Date(newestBulletin.createdAt.toDate()).toLocaleString()}
+              </p>
+            </div>
+            <p>{newestBulletin.message}</p>
+            <button
+              className={styles.viewAllButton}
+              onClick={() => setShowBulletinOverlay(true)}
+            >
+              View All Bulletins
+            </button>
+          </div>
+        )}
+
         <div className={styles.buttonAndBreakGroup}>
           <div className={styles.buttonGroup}>
             <button
