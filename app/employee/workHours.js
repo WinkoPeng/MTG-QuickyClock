@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import db from "../firebase";
-import styles from "./workHours.module.css";
 
 const WEEKDAYS_ORDER = [
   "Monday",
@@ -46,24 +45,28 @@ const WorkHours = ({ employeeId }) => {
   );
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.heading}>Your weekly work hours</h2>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Hours</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedWorkHours.map(([day, hours]) => (
-            <tr key={day}>
-              <td>{day}</td>
-              <td>{hours}</td>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h2 className="text-3xl font-bold text-gray-800 mb-6">
+        Your Weekly Work Hours
+      </h2>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+          <thead>
+            <tr className="bg-gray-100 text-left text-gray-600">
+              <th className="px-6 py-3 border-b border-gray-200">Day</th>
+              <th className="px-6 py-3 border-b border-gray-200">Hours</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sortedWorkHours.map(([day, hours]) => (
+              <tr key={day} className="hover:bg-gray-50">
+                <td className="px-6 py-4 border-b border-gray-200">{day}</td>
+                <td className="px-6 py-4 border-b border-gray-200">{hours}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

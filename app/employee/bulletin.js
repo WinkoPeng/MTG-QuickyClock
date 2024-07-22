@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import db from "../firebase";
-import "./bulletin.css";
 
 const UserBulletinBoard = () => {
   const [bulletins, setBulletins] = useState([]);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const fetchBulletins = async () => {
@@ -37,23 +37,84 @@ const UserBulletinBoard = () => {
     fetchBulletins();
   }, []);
 
+  // Get the latest bulletin
+  const latestBulletin = bulletins.length > 0 ? bulletins[0] : null;
+
   return (
-    <div className="user-bulletin-board">
-      <h1>User Bulletin Board</h1>
-      <ul className="bulletin-list">
-        {bulletins.map((bulletin) => (
-          <li key={bulletin.id} className="bulletin-item">
-            <div className="bulletin-header">
-              <h2 className="bulletin-title">{bulletin.title}</h2>
-              <p className="bulletin-author">By: {bulletin.author}</p>
-            </div>
-            <p className="bulletin-message">{bulletin.message}</p>
-            <p className="bulletin-timestamp">
-              {new Date(bulletin.createdAt.toDate()).toLocaleString()}
-            </p>
-          </li>
-        ))}
-      </ul>
+    <div className="relative p-4 bg-gray-100">
+      <h1 className="text-2xl font-bold mb-4">Bulletin Board</h1>
+
+      {latestBulletin && !showAll ? (
+        <div className="p-3 bg-white shadow-md rounded-lg mb-4">
+          {/* Latest bulletin preview */}
+          <div className="mb-1">
+            <h2 className="text-lg font-semibold text-gray-800">
+              {latestBulletin.title}
+            </h2>
+            <p className="text-xs text-gray-600">By: {latestBulletin.author}</p>
+          </div>
+          <p className="text-gray-700 mb-1">{latestBulletin.message}</p>
+          <p className="text-xs text-gray-500">
+            {new Date(latestBulletin.createdAt.toDate()).toLocaleString()}
+          </p>
+          <button
+            onClick={() => setShowAll(true)}
+            className="mt-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+          >
+            Show All Messages
+          </button>
+        </div>
+      ) : null}
+
+      {/* Full list overlay */}
+      {showAll && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-lg max-h-[80vh] overflow-y-auto relative">
+            <button
+              onClick={() => setShowAll(false)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+              aria-label="Close"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+            <h2 className="text-xl font-bold mb-4">All Bulletins</h2>
+            <ul className="space-y-2">
+              {bulletins.map((bulletin) => (
+                <li
+                  key={bulletin.id}
+                  className="p-2 bg-gray-50 shadow-md rounded-lg"
+                >
+                  <div className="mb-1">
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {bulletin.title}
+                    </h3>
+                    <p className="text-xs text-gray-600">
+                      By: {bulletin.author}
+                    </p>
+                  </div>
+                  <p className="text-gray-700 mb-1">{bulletin.message}</p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(bulletin.createdAt.toDate()).toLocaleString()}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

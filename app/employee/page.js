@@ -24,6 +24,7 @@ import {
   handleStartBreak,
   formatWorkDuration,
 } from "./timer";
+import UserBulletinBoard from "./bulletin";
 
 const Employee = () => {
   const router = useRouter();
@@ -102,34 +103,6 @@ const Employee = () => {
     };
 
     fetchData();
-
-    const fetchBulletins = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "bulletins"));
-        const bulletinsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Sort bulletins by the 'createdAt' field in descending order
-        const sortedBulletins = bulletinsData.sort((a, b) => {
-          const dateA = a.createdAt.toDate
-            ? a.createdAt.toDate()
-            : new Date(a.createdAt);
-          const dateB = b.createdAt.toDate
-            ? b.createdAt.toDate()
-            : new Date(b.createdAt);
-          return dateB - dateA;
-        });
-
-        setBulletins(sortedBulletins);
-        setNewestBulletin(sortedBulletins[0]);
-      } catch (error) {
-        console.error("Error fetching bulletins:", error);
-      }
-    };
-
-    fetchBulletins();
 
     const timer = setInterval(() => {
       const now = DateTime.now().setZone("America/Edmonton");
@@ -252,38 +225,33 @@ const Employee = () => {
       dark:[&::-webkit-scrollbar-track]:bg-neutral-700
       dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 ${styles.formContainer}`}
       >
-        <h1>
-          {greeting}, {userName}!
-        </h1>
+        <div className="p-6 space-y-4 bg-white shadow-md rounded-lg">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            {greeting}, {userName}!
+          </h1>
 
-        <div className={styles.currentTime}>Current Time: {currentTime}</div>
-        <div className={styles.currentTime}>
-          Auto Logout In: {Math.floor(autoLogoutTime / 60)}:
-          {String(autoLogoutTime % 60).padStart(2, "0")}
-          <div className={styles.currentTime}>
-            Today&apos;s Work Duration: {formatWorkDuration(workDurationToday)}
-          </div>{" "}
-        </div>
-        {newestBulletin && (
-          <div className={styles.bulletinSection}>
-            <h2>Bulletin Board</h2>
-            <div className={styles.bulletinHeader}>
-              <h3>{newestBulletin.title}</h3>
-              <p>By: {newestBulletin.author}</p>
-              <p>
-                {new Date(newestBulletin.createdAt.toDate()).toLocaleString()}
-              </p>
-            </div>
-            <p>{newestBulletin.message}</p>
-            <button
-              className={styles.viewAllButton}
-              onClick={() => setShowBulletinOverlay(true)}
-            >
-              View All Bulletins
-            </button>
+          <div className="text-lg text-gray-800 dark:text-gray-200">
+            <p>
+              Current Time: <span className="font-semibold">{currentTime}</span>
+            </p>
+            <p>
+              Auto Logout In:{" "}
+              <span className="font-semibold text-blue-600 dark:text-blue-400">
+                {Math.floor(autoLogoutTime / 60)}:
+                {String(autoLogoutTime % 60).padStart(2, "0")}
+              </span>
+            </p>
+            <p>
+              Today&apos;s Work Duration:{" "}
+              <span className="font-semibold">
+                {formatWorkDuration(workDurationToday)}
+              </span>
+            </p>
           </div>
-        )}
-
+        </div>
+        <div className="w-full max-w-xl bg-white p-4 rounded-lg shadow-lg">
+          <UserBulletinBoard />
+        </div>
         <div className={styles.buttonAndBreakGroup}>
           <div className={styles.buttonGroup}>
             <button
