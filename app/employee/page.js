@@ -244,7 +244,14 @@ const Employee = () => {
   return (
     <div className={styles.container}>
       <title>MTG - Employee</title>
-      <div className={styles.formContainer}>
+      <div
+        className={`overflow-y-auto
+      [&::-webkit-scrollbar]:w-2
+      [&::-webkit-scrollbar-track]:bg-gray-100
+      [&::-webkit-scrollbar-thumb]:bg-gray-300
+      dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 ${styles.formContainer}`}
+      >
         <h1>
           {greeting}, {userName}!
         </h1>
@@ -256,7 +263,6 @@ const Employee = () => {
           <div className={styles.currentTime}>
             Today&apos;s Work Duration: {formatWorkDuration(workDurationToday)}
           </div>{" "}
-          {/* 新增行 */}
         </div>
         {newestBulletin && (
           <div className={styles.bulletinSection}>

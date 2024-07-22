@@ -93,7 +93,7 @@ function Admin() {
       <title>MTG - Admin</title>
       <div className={styles.sidebar}>
         <div className={styles.welcome}>
-          <h3>Welcome,</h3>
+          <h3 className="text-2xl">Welcome,</h3>
           <h2>{adminName}</h2>
         </div>
         <div className={styles.menu}>
@@ -149,12 +149,7 @@ function Admin() {
           <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
-      <div className={styles.main}>
-        <div className={styles.dashboardHeader}>
-          <h1>Admin</h1>
-        </div>
-        {renderPage()}
-      </div>
+      <div className={styles.main}>{renderPage()}</div>
     </div>
   );
 }

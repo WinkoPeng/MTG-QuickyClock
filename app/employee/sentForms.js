@@ -35,22 +35,26 @@ const SentForms = ({ userId }) => {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="sent-forms-container">
-      <h2>My Sent Forms</h2>
+    <div className="p-4">
+      <h2 className="text-2xl font-semibold mb-4">My Sent Forms</h2>
       {forms.length === 0 ? (
-        <p>No sent forms found.</p>
+        <p className="text-gray-500">No sent forms found.</p>
       ) : (
-        <ul className="sent-forms-list">
+        <ul className="space-y-4">
           {forms.map((form) => (
-            <li key={form.id} className="sent-form-item">
-              <p>
-                <strong>Message:</strong> {form.message}
+            <li
+              key={form.id}
+              className="bg-white border border-gray-200 rounded-lg p-4 shadow-md"
+            >
+              <p className="text-gray-800">
+                <strong className="font-semibold">Message:</strong>{" "}
+                {form.message}
               </p>
-              <p>
-                <strong>Status:</strong> {form.status}
+              <p className="text-gray-800">
+                <strong className="font-semibold">Status:</strong> {form.status}
               </p>
-              <p>
-                <strong>Time:</strong>{" "}
+              <p className="text-gray-800">
+                <strong className="font-semibold">Time:</strong>{" "}
                 {new Date(form.createdAt.seconds * 1000).toLocaleString()}
               </p>
             </li>
