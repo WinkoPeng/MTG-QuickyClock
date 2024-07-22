@@ -105,3 +105,25 @@ a {
     color-scheme: dark;
   }
 }
+
+.component {
+  background-color: rgb(var(--tile-start-rgb));
+  border: 1px solid var(--tile-border);
+  color: black !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    color: black !important;
+  }
+
+  .component {
+    background-color: rgb(var(--tile-start-rgb));
+    border: 1px solid var(--tile-border);
+    color: black !important;
+  }
+}

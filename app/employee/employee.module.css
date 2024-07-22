@@ -350,3 +350,9 @@
 .sent-form-item p {
   margin: 5px 0;
 }
+.currentTime {
+  font-size: 1.5em;
+  margin: 10px 0;
+}
+
+/* 其他样式保持不变 */

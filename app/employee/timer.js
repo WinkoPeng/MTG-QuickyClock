@@ -12,47 +12,13 @@ import { validateLocation } from "./geolocate";
 
 let intervalId = null;
 
-const startInterval = (
-  userId,
-  setIsClockedIn,
-  setTotalBreakDuration,
-  addLog,
-  clockInTime,
-  totalBreakDuration,
-  isOnBreak,
-  breakTimer,
-  setIsOnBreak
-) => {
+const startInterval = (userId, setWorkDurationToday) => {
   if (intervalId) {
     clearInterval(intervalId);
   }
   intervalId = setInterval(async () => {
-    const isOnBreak = await checkIfOnBreak(userId);
-    if (!isOnBreak) {
-      await updateWorkDuration(
-        userId,
-        setIsClockedIn,
-        setTotalBreakDuration,
-        addLog,
-        clockInTime,
-        totalBreakDuration,
-        isOnBreak,
-        breakTimer,
-        setIsOnBreak
-      );
-    }
+    await updateWorkDuration(userId, setWorkDurationToday);
   }, 60000); // Update every minute
-};
-
-const checkIfOnBreak = async (userId) => {
-  const q = query(collection(db, "employee"), where("id", "==", userId));
-  const querySnapshot = await getDocs(q);
-  if (!querySnapshot.empty) {
-    const userDoc = querySnapshot.docs[0];
-    const userData = userDoc.data();
-    return userData.isOnBreak;
-  }
-  return false;
 };
 
 const calculateLastMonthWorkDuration = (workPeriod) => {
@@ -126,17 +92,7 @@ const calculateThisMonthWorkDuration = (workPeriod) => {
   return thisMonthWorkDuration;
 };
 
-const updateWorkDuration = async (
-  userId,
-  setIsClockedIn,
-  setTotalBreakDuration,
-  addLog,
-  clockInTime,
-  totalBreakDuration,
-  isOnBreak,
-  breakTimer,
-  setIsOnBreak
-) => {
+const updateWorkDuration = async (userId, setWorkDurationToday) => {
   const q = query(collection(db, "employee"), where("id", "==", userId));
   const querySnapshot = await getDocs(q);
   if (!querySnapshot.empty) {
@@ -147,80 +103,28 @@ const updateWorkDuration = async (
     if (userData.status === "online") {
       const now = DateTime.now().setZone("America/Edmonton");
       const today = now.toISODate();
-      const lastOnlineDate = userData.lastOnlineDate || today;
+      const clockInEntry = userData.workTime[today];
+      const startTime = DateTime.fromISO(clockInEntry.split(" - ")[0], {
+        zone: "America/Edmonton",
+      });
+      const totalBreakDuration = userData.totalBreakDuration || 0;
+      let workDurationToday = Math.round(
+        now.diff(startTime, "minutes").minutes - totalBreakDuration
+      );
 
-      let workDurationToday = userData.workDurationToday || 0;
-      if (today !== lastOnlineDate) {
+      if (workDurationToday < 0) {
         workDurationToday = 0;
       }
 
-      const dayOfWeek = now.weekdayLong; // e.g., 'Sunday'
-      const workHoursToday = userData.workHours[dayOfWeek];
-      const [start, end] = workHoursToday.split(" - ");
-      const workDurationLimit = DateTime.fromISO(end).diff(
-        DateTime.fromISO(start),
-        "minutes"
-      ).minutes;
-
-      if (workDurationToday >= workDurationLimit) {
-        clearInterval(intervalId);
-        alert("Work duration limit for today has been reached.");
-        await handleClockOut(
-          userId,
-          setIsClockedIn,
-          setTotalBreakDuration,
-          addLog,
-          clockInTime,
-          totalBreakDuration,
-          isOnBreak,
-          breakTimer,
-          setIsOnBreak
-        );
-        return;
-      }
-
-      const endTime = DateTime.fromISO(end, { zone: "America/Edmonton" }).plus({
-        minutes: 30,
-      });
-      if (now > endTime) {
-        clearInterval(intervalId);
-        alert("Auto clocking out as work time has ended.");
-        await handleClockOut(
-          userId,
-          setIsClockedIn,
-          setTotalBreakDuration,
-          addLog,
-          clockInTime,
-          totalBreakDuration,
-          isOnBreak,
-          breakTimer,
-          setIsOnBreak
-        );
-        return;
-      }
-
-      workDurationToday += 1;
+      setWorkDurationToday(workDurationToday);
 
       const updatedWorkPeriod = {
         ...userData.workPeriod,
         [today]: workDurationToday,
       };
 
-      const totalWorkDuration = (userData.totalWorkDuration || 0) + 1;
-      const thisMonthWorkDuration =
-        calculateThisMonthWorkDuration(updatedWorkPeriod);
-      const twoWeeksWorkDuration =
-        calculateTwoWeeksWorkDuration(updatedWorkPeriod);
-      const lastMonthWorkDuration =
-        calculateLastMonthWorkDuration(updatedWorkPeriod);
-
       await updateDoc(userRef, {
         workDurationToday,
-        totalWorkDuration,
-        twoWeeksWorkDuration,
-        thisMonthWorkDuration,
-        lastMonthWorkDuration,
-        lastOnlineDate: today,
         workPeriod: updatedWorkPeriod,
       });
 
@@ -236,12 +140,7 @@ const handleClockIn = async (
   setClockInTime,
   setIsClockedIn,
   addLog,
-  setTotalBreakDuration,
-  clockInTime,
-  totalBreakDuration,
-  isOnBreak,
-  breakTimer,
-  setIsOnBreak
+  setWorkDurationToday
 ) => {
   if (!(await validateLocation(userId))) {
     alert("You are not within the allowed location to clock in.");
@@ -287,29 +186,23 @@ const handleClockIn = async (
       );
 
       const today = now.toISODate();
-      const updatedWorkPeriod = { ...userData.workPeriod, [today]: 0 };
+      const updatedWorkTime = {
+        ...userData.workTime,
+        [today]: clockInTime.toFormat("HH:mm"),
+      };
 
       await updateDoc(userRef, {
         status: "online",
-        workDurationToday: userData.workDurationToday || 0,
-        workPeriod: updatedWorkPeriod,
+        workDurationToday: 0,
+        workTime: updatedWorkTime,
+        totalBreakDuration: 0,
         isOnBreak: false,
       });
 
       console.log(
         "User status set to online and workDurationToday initialized."
       );
-      startInterval(
-        userId,
-        setIsClockedIn,
-        setTotalBreakDuration,
-        addLog,
-        clockInTime,
-        totalBreakDuration,
-        isOnBreak,
-        breakTimer,
-        setIsOnBreak
-      );
+      startInterval(userId, setWorkDurationToday);
     } else {
       console.log(`User document does not exist for ID: ${userId}`);
     }
@@ -321,33 +214,14 @@ const handleClockIn = async (
 const handleClockOut = async (
   userId,
   setIsClockedIn,
-  setTotalBreakDuration,
   addLog,
-  clockInTime,
-  totalBreakDuration,
-  isOnBreak,
-  breakTimer,
+  setWorkDurationToday,
   setIsOnBreak
 ) => {
   setIsClockedIn(false);
 
   const now = DateTime.now().setZone("America/Edmonton");
-  if (isOnBreak) {
-    clearTimeout(breakTimer);
-    addLog(
-      `Break ended at ${now.toLocaleString(
-        DateTime.DATETIME_FULL_WITH_SECONDS
-      )}`
-    );
-    const breakEndTime = now;
-    const breakStartTime = clockInTime.plus({ minutes: totalBreakDuration });
-    const breakDuration = breakEndTime.diff(breakStartTime, "minutes").minutes;
-    setTotalBreakDuration((prevDuration) => prevDuration + breakDuration);
-    setIsOnBreak(false);
-  }
-
   const clockOutTime = now;
-
   addLog(
     `Clocked Out at ${clockOutTime.toLocaleString(
       DateTime.DATETIME_FULL_WITH_SECONDS
@@ -360,18 +234,50 @@ const handleClockOut = async (
     if (!querySnapshot.empty) {
       const userDoc = querySnapshot.docs[0];
       const userRef = doc(db, "employee", userDoc.id);
+      const userData = userDoc.data();
+
+      const today = now.toISODate();
+      const clockInEntry = userData.workTime[today];
+      const startTime = DateTime.fromISO(clockInEntry, {
+        zone: "America/Edmonton",
+      });
+      let totalWorkDurationToday = Math.round(
+        now.diff(startTime, "minutes").minutes -
+          (userData.totalBreakDuration || 0)
+      );
+
+      // 确保工作时长不为负数
+      if (totalWorkDurationToday < 0) {
+        totalWorkDurationToday = 0;
+      }
+
+      const updatedWorkPeriod = {
+        ...userData.workPeriod,
+        [today]: totalWorkDurationToday,
+      };
+      const updatedWorkTime = {
+        ...userData.workTime,
+        [today]: `${clockInEntry} - ${clockOutTime.toFormat("HH:mm")}`,
+      };
+
       await updateDoc(userRef, {
         status: "offline",
+        lastOnlineDate: today, // 仅保存日期
         isOnBreak: false,
+        workDurationToday: totalWorkDurationToday,
+        workPeriod: updatedWorkPeriod,
+        workTime: updatedWorkTime,
       });
-      console.log("User status set to offline.");
+
+      console.log("User status set to offline and work duration updated.");
+      setWorkDurationToday(totalWorkDurationToday);
+      setIsOnBreak(false); // 恢复休息按钮
     } else {
       console.log(`User document does not exist for ID: ${userId}`);
     }
   } catch (error) {
     console.error("Error clocking out:", error);
   }
-  setTotalBreakDuration(0);
 };
 
 const handleStartBreak = async (
@@ -394,8 +300,12 @@ const handleStartBreak = async (
     const userDoc = querySnapshot.docs[0];
     const userRef = doc(db, "employee", userDoc.id);
 
+    const totalBreakDuration =
+      (userDoc.data().totalBreakDuration || 0) + parseInt(breakDuration);
+
     await updateDoc(userRef, {
       isOnBreak: true,
+      totalBreakDuration,
     });
 
     setBreakTimer(
@@ -415,14 +325,19 @@ const handleStartBreak = async (
   }
 };
 
+const formatWorkDuration = (duration) => {
+  if (duration === 0) {
+    return "0 h 0 m";
+  }
+  const hours = Math.floor(duration / 60);
+  const minutes = duration % 60;
+  return `${hours} h ${minutes} m`;
+};
+
 export {
-  startInterval,
-  checkIfOnBreak,
-  calculateLastMonthWorkDuration,
-  calculateTwoWeeksWorkDuration,
-  calculateThisMonthWorkDuration,
-  updateWorkDuration,
   handleClockIn,
   handleClockOut,
   handleStartBreak,
+  updateWorkDuration,
+  formatWorkDuration,
 };

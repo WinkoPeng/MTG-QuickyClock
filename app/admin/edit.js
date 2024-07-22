@@ -52,6 +52,7 @@ function Edit({ employee, onCancel }) {
     hours: 0,
     minutes: 0,
   });
+  const [selectedDateWorkTime, setSelectedDateWorkTime] = useState("");
 
   useEffect(() => {
     const fetchGeofences = async () => {
@@ -74,6 +75,7 @@ function Edit({ employee, onCancel }) {
         totalWorkDuration,
         workHours,
         workPeriod,
+        workTime,
         ...rest
       } = employee;
 
@@ -92,11 +94,16 @@ function Edit({ employee, onCancel }) {
         totalWorkDuration: convertMinutesToHoursAndMinutes(totalWorkDuration),
       });
 
-      // Set selected date work duration if workPeriod is available
       if (workPeriod && selectedDate && workPeriod[selectedDate]) {
         setSelectedDateWorkDuration(
           convertMinutesToHoursAndMinutes(workPeriod[selectedDate])
         );
+      }
+
+      if (workTime && selectedDate && workTime[selectedDate]) {
+        setSelectedDateWorkTime(workTime[selectedDate]);
+      } else {
+        setSelectedDateWorkTime("");
       }
     }
   }, [employee, selectedDate]);
@@ -169,6 +176,16 @@ function Edit({ employee, onCancel }) {
     } else {
       setSelectedDateWorkDuration({ hours: 0, minutes: 0 });
     }
+
+    if (employee.workTime && employee.workTime[e.target.value]) {
+      setSelectedDateWorkTime(employee.workTime[e.target.value]);
+    } else {
+      setSelectedDateWorkTime("");
+    }
+  };
+
+  const handleWorkTimeChange = (e) => {
+    setSelectedDateWorkTime(e.target.value);
   };
 
   const handleSubmit = async (e) => {
@@ -212,24 +229,17 @@ function Edit({ employee, onCancel }) {
             "- -";
           return acc;
         }, {}),
-      };
-
-      if (
-        selectedDate &&
-        (selectedDateWorkDuration.hours > 0 ||
-          selectedDateWorkDuration.minutes > 0)
-      ) {
-        updatedFormData.workPeriod = {
+        workPeriod: {
           ...employee.workPeriod,
           [selectedDate]: convertHoursAndMinutesToMinutes(
             selectedDateWorkDuration
           ),
-        };
-      } else {
-        updatedFormData.workPeriod = {
-          ...employee.workPeriod,
-        };
-      }
+        },
+        workTime: {
+          ...employee.workTime,
+          [selectedDate]: selectedDateWorkTime,
+        },
+      };
 
       await updateDoc(docRef, updatedFormData);
       alert("Employee updated successfully!");
@@ -461,6 +471,19 @@ function Edit({ employee, onCancel }) {
               className={styles.inputTime}
             />
             <span>mins</span>
+          </div>
+        </div>
+        <div className={styles.formGroup}>
+          <div className={styles.durationFields}>
+            <label htmlFor="selectedDateWorkTime">Start Time - End Time</label>
+            <input
+              type="text"
+              name="selectedDateWorkTime"
+              placeholder="Start time & End time"
+              value={selectedDateWorkTime}
+              onChange={handleWorkTimeChange}
+              className={styles.input}
+            />
           </div>
         </div>
 

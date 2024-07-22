@@ -24,6 +24,15 @@ import {
 import Contact from "./contact";
 import SentForms from "./sentForms";
 import WorkHours from "./workHours";
+import styles from "./employee.module.css";
+import withAuth from "../withAuth";
+import {
+  handleClockIn,
+  handleClockOut,
+  updateWorkDuration,
+  handleStartBreak,
+  formatWorkDuration,
+} from "./timer";
 
 const Employee = () => {
   const router = useRouter();
@@ -34,7 +43,7 @@ const Employee = () => {
   );
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
-  const [breakTime, setBreakTime] = useState("");
+  const [breakTime, setBreakTime] = useState("15"); // 初始化为 15 分钟
   const [customBreakTime, setCustomBreakTime] = useState("");
   const [selectedOption, setSelectedOption] = useState("select");
   const [log, setLog] = useState([]);
@@ -51,6 +60,7 @@ const Employee = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [workDurationToday, setWorkDurationToday] = useState(0); // 新增状态
 
   const [bulletins, setBulletins] = useState([]);
   const [showBulletinOverlay, setShowBulletinOverlay] = useState(false);
@@ -92,7 +102,7 @@ const Employee = () => {
 
           if (employeeData.status === "online") {
             setIsClockedIn(true);
-            updateWorkDuration(storedUserId); // Continue updating work duration if user is online
+            updateWorkDuration(storedUserId, setWorkDurationToday); // 继续更新工作时长
           } else {
             setIsClockedIn(false);
           }
@@ -136,6 +146,7 @@ const Employee = () => {
       setAutoLogoutTime((prevTime) =>
         prevTime <= 1 ? handleAutoLogout() : prevTime - 1
       );
+      updateWorkDuration(userId, setWorkDurationToday); // 每分钟更新工作时长
 
       const hour = now.hour;
       if (hour < 12) {
@@ -148,7 +159,7 @@ const Employee = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [handleAutoLogout]);
+  }, [handleAutoLogout, userId]);
 
   const handleBreakTimeChange = (event) => {
     setBreakTime(event.target.value);
@@ -230,10 +241,18 @@ const Employee = () => {
     router.push("/");
   };
 
+  const formatWorkDuration = (duration) => {
+    if (duration === 0) {
+      return "0 h 0 m";
+    }
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    return `${hours} h ${minutes} m`;
+  };
+
   return (
     <div className={styles.container}>
-      {/* Bulletin Section */}
-
+      <title>MTG - Employee</title>
       <div className={styles.formContainer}>
         <h1>
           {greeting}, {userName}!
@@ -243,6 +262,10 @@ const Employee = () => {
         <div className={styles.currentTime}>
           Auto Logout In: {Math.floor(autoLogoutTime / 60)}:
           {String(autoLogoutTime % 60).padStart(2, "0")}
+          <div className={styles.currentTime}>
+            Today&apos;s Work Duration: {formatWorkDuration(workDurationToday)}
+          </div>{" "}
+          {/* 新增行 */}
         </div>
         {newestBulletin && (
           <div className={styles.bulletinSection}>
@@ -379,6 +402,7 @@ const Employee = () => {
                 <th>Message</th>
               </tr>
             </thead>
+
             <tbody>
               {log.map((entry, index) => (
                 <tr key={index}>

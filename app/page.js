@@ -79,6 +79,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <title>MTG</title>
       <div className={styles.formContainer}>
         <Image
           src={mtglogo}
