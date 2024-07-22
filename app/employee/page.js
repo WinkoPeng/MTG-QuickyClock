@@ -12,15 +12,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import db from "../firebase";
-
-import styles from "./employee.module.css";
-import withAuth from "../withAuth";
-import {
-  handleClockIn,
-  handleClockOut,
-  updateWorkDuration,
-  handleStartBreak,
-} from "./timer";
 import Contact from "./contact";
 import SentForms from "./sentForms";
 import WorkHours from "./workHours";
