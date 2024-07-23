@@ -465,3 +465,8 @@
     font-size: 12px; /* Adjust font size for smaller screens */
   }
 }
+
+#map-container {
+  height: 400px;
+  width: 100%;
+}

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import db from "../firebase";
@@ -6,7 +8,7 @@ import "./contact.css";
 const Contact = ({ userName, updateMessages }) => {
   const [contactForms, setContactForms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [adminName, setAdminName] = useState(userName);
+  const [adminName, setAdminName] = useState("");
 
   useEffect(() => {
     const fetchContactForms = async () => {
@@ -23,7 +25,7 @@ const Contact = ({ userName, updateMessages }) => {
     };
     fetchContactForms();
     setAdminName(userName);
-  }, []);
+  }, [userName]);
 
   const handleUpdateStatus = async (id, newStatus) => {
     const formDoc = doc(db, "messages", id);

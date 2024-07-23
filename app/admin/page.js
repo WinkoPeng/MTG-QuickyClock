@@ -11,9 +11,12 @@ import EmployeeList from "./employeeList";
 import Dashboard from "./dashboard";
 import Edit from "./edit";
 import GeofenceDisplay from "./geofenceDisplay";
-import GeofenceSetup from "./geofenceSetup";
+const GeofenceSetup = dynamic(() => import("./geofenceSetup"), {
+  ssr: false,
+});
 import Contact from "./contact";
 import Bulletin from "./bulletin";
+import dynamic from "next/dynamic";
 
 import { collection, query, where, getDocs } from "firebase/firestore";
 import db from "../firebase";
