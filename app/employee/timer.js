@@ -10,17 +10,6 @@ import { DateTime } from "luxon";
 import db from "../firebase";
 import { validateLocation } from "./geolocate";
 
-let intervalId = null;
-
-const startInterval = (userId, setWorkDurationToday) => {
-  if (intervalId) {
-    clearInterval(intervalId);
-  }
-  intervalId = setInterval(async () => {
-    await updateWorkDuration(userId, setWorkDurationToday);
-  }, 60000); // Update every minute
-};
-
 const calculateLastMonthWorkDuration = (workPeriod) => {
   const now = DateTime.now().setZone("America/Edmonton");
   const lastMonth = now.minus({ months: 1 }).month;
@@ -95,6 +84,7 @@ const calculateThisMonthWorkDuration = (workPeriod) => {
 const updateWorkDuration = async (userId, setWorkDurationToday) => {
   const q = query(collection(db, "employee"), where("id", "==", userId));
   const querySnapshot = await getDocs(q);
+
   if (!querySnapshot.empty) {
     const userDoc = querySnapshot.docs[0];
     const userRef = doc(db, "employee", userDoc.id);
@@ -104,6 +94,13 @@ const updateWorkDuration = async (userId, setWorkDurationToday) => {
       const now = DateTime.now().setZone("America/Edmonton");
       const today = now.toISODate();
       const clockInEntry = userData.workTime[today];
+
+      // Ensure clockInEntry exists
+      if (!clockInEntry) {
+        console.log("No clock-in entry found for today.");
+        return;
+      }
+
       const startTime = DateTime.fromISO(clockInEntry.split(" - ")[0], {
         zone: "America/Edmonton",
       });
@@ -112,15 +109,18 @@ const updateWorkDuration = async (userId, setWorkDurationToday) => {
         now.diff(startTime, "minutes").minutes - totalBreakDuration
       );
 
+      // Ensure work duration is not negative
       if (workDurationToday < 0) {
         workDurationToday = 0;
       }
 
       setWorkDurationToday(workDurationToday);
 
+      // Accumulate work duration for the day
+      const previousWorkDuration = userData.workPeriod[today] || 0;
       const updatedWorkPeriod = {
         ...userData.workPeriod,
-        [today]: workDurationToday,
+        [today]: previousWorkDuration + workDurationToday,
       };
 
       await updateDoc(userRef, {
@@ -129,8 +129,6 @@ const updateWorkDuration = async (userId, setWorkDurationToday) => {
       });
 
       console.log("Work duration updated successfully.");
-    } else {
-      clearInterval(intervalId);
     }
   }
 };
@@ -140,12 +138,15 @@ const handleClockIn = async (
   setClockInTime,
   setIsClockedIn,
   addLog,
-  setWorkDurationToday
+  setIsLoading
 ) => {
+  setIsLoading(true);
   if (!(await validateLocation(userId))) {
+    setIsLoading(false);
     alert("You are not within the allowed location to clock in.");
     return;
   }
+  setIsLoading(false);
 
   const q = query(collection(db, "employee"), where("id", "==", userId));
   try {
@@ -156,7 +157,7 @@ const handleClockIn = async (
       const userData = userDoc.data();
 
       const now = DateTime.now().setZone("America/Edmonton");
-      const dayOfWeek = now.weekdayLong; // e.g., 'Sunday'
+      const dayOfWeek = now.weekdayLong;
       const workHoursToday = userData.workHours[dayOfWeek];
 
       if (workHoursToday === " - ") {
@@ -198,9 +199,6 @@ const handleClockIn = async (
         totalBreakDuration: 0,
         isOnBreak: false,
       });
-
-      console.log("User status set to online and work duration initialized.");
-      startInterval(userId, setWorkDurationToday);
     } else {
       console.log(`User document does not exist for ID: ${userId}`);
     }
@@ -237,7 +235,11 @@ const handleClockOut = async (
       const today = now.toISODate();
       const clockInEntry = userData.workTime[today];
 
-      // Handling case where the clock-out happens after midnight
+      if (!clockInEntry) {
+        console.log("No clock-in entry found for today.");
+        return;
+      }
+
       const clockInDateTime = DateTime.fromISO(clockInEntry, {
         zone: "America/Edmonton",
       });
@@ -247,7 +249,6 @@ const handleClockOut = async (
           (userData.totalBreakDuration || 0)
       );
 
-      // Ensure work duration is not negative
       if (totalWorkDurationToday < 0) {
         totalWorkDurationToday = 0;
       }
@@ -266,14 +267,13 @@ const handleClockOut = async (
 
       await updateDoc(userRef, {
         status: "offline",
-        lastOnlineDate: today, // Only save the date
+        lastOnlineDate: today,
         isOnBreak: false,
         workDurationToday: totalWorkDurationToday,
         workPeriod: updatedWorkPeriod,
         workTime: updatedWorkTime,
       });
 
-      // Handle work duration for the next day if needed
       if (clockOutTime.startOf("day") > clockInDateTime.startOf("day")) {
         const nextDay = clockOutTime.plus({ days: 1 }).toISODate();
         const nextDayWorkDuration = userData.workPeriod[nextDay] || 0;
@@ -288,7 +288,7 @@ const handleClockOut = async (
 
       console.log("User status set to offline and work duration updated.");
       setWorkDurationToday(totalWorkDurationToday);
-      setIsOnBreak(false); // Reset break button
+      setIsOnBreak(false);
     } else {
       console.log(`User document does not exist for ID: ${userId}`);
     }

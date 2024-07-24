@@ -18,15 +18,11 @@ import {
   handleStartBreak,
   formatWorkDuration,
 } from "./timer";
-import styles from "./employee.module.css";
 
 const Employee = () => {
   const router = useRouter();
-  const [currentTime, setCurrentTime] = useState(
-    DateTime.now()
-      .setZone("America/Edmonton")
-      .toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)
-  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState("");
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
   const [breakTime, setBreakTime] = useState("15");
@@ -43,7 +39,6 @@ const Employee = () => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showSentFormsModal, setSentFormsModal] = useState(false);
-  const [workDurationToday, setWorkDurationToday] = useState(0); // 新增状态
 
   const addLog = useCallback(
     (message) => {
@@ -81,7 +76,6 @@ const Employee = () => {
 
           if (employeeData.status === "online") {
             setIsClockedIn(true);
-            updateWorkDuration(storedUserId, setWorkDurationToday); // 继续更新工作时长
           } else {
             setIsClockedIn(false);
           }
@@ -90,27 +84,41 @@ const Employee = () => {
     };
 
     fetchData();
+  }, [userId]);
 
-    const timer = setInterval(() => {
+  useEffect(() => {
+    // Timer for current time and greeting
+    const timeInterval = setInterval(() => {
       const now = DateTime.now().setZone("America/Edmonton");
       setCurrentTime(now.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS));
-      setAutoLogoutTime((prevTime) =>
-        prevTime <= 1 ? handleAutoLogout() : prevTime - 1
-      );
-      updateWorkDuration(userId, setWorkDurationToday); // 每分钟更新工作时长
 
       const hour = now.hour;
       if (hour < 12) {
-        setGreeting("Good morning");
+        setGreeting("morning");
       } else if (hour < 18) {
-        setGreeting("Good afternoon");
+        setGreeting("afternoon");
       } else {
-        setGreeting("Good evening");
+        setGreeting("evening");
       }
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [handleAutoLogout, userId]);
+    return () => {
+      clearInterval(timeInterval);
+    };
+  }, [userId]);
+
+  // Handle auto logout timer
+  useEffect(() => {
+    if (autoLogoutTime > 0) {
+      const autoLogoutInterval = setInterval(() => {
+        setAutoLogoutTime((prevTime) =>
+          prevTime <= 1 ? handleAutoLogout() : prevTime - 1
+        );
+      }, 1000); // 1000 milliseconds = 1 second
+
+      return () => clearInterval(autoLogoutInterval);
+    }
+  }, [autoLogoutTime]);
 
   const handleBreakTimeChange = (event) => {
     setBreakTime(event.target.value);
@@ -162,13 +170,16 @@ const Employee = () => {
       <div className="container mx-auto dark:bg-gray-900">
         <title>MTG - Employee</title>
         <div className="bg-white min-w-full dark:bg-gray-900 p-4 shadow-lg">
-          <h1 className="text-2xl text-center font-bold mb-2 text-gray-900 dark:text-gray-100">
-            {greeting}, {userName}
-          </h1>
-
-          {/*Time section*/}
-          <div className="flex flex-col md:flex-row md:space-x-4 mt-4">
-            <div className="text-lg bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+          {/* Greeting and Time Section */}
+          <div className="flex flex-col mb-4">
+            {/* Greeting Section */}
+            <div className="text-center px-2 mb-4">
+              <h1 className="text-xl font-bold mb-1 text-gray-900 dark:text-gray-100">
+                Good {greeting}, {userName}
+              </h1>
+            </div>
+            {/* Time Section */}
+            <div className="text-sm md:text-base lg:text-lg xl:text-xl bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md text-center md:text-left lg:text-center">
               <p className="text-gray-900 dark:text-gray-100">
                 Current Time:{" "}
                 <span className="font-semibold">{currentTime}</span>
@@ -180,65 +191,68 @@ const Employee = () => {
                   {String(autoLogoutTime % 60).padStart(2, "0")}
                 </span>
               </p>
-              <p className="text-gray-900 dark:text-gray-100">
-                Today&apos;s Work Duration:{" "}
-                <span className="font-semibold text-green-600 dark:text-green-400">
-                  {formatWorkDuration(workDurationToday)}
-                </span>
-              </p>
             </div>
+          </div>
 
-            {/*Announcements*/}
+          {/* Announcements and Clock In/Out */}
+          <div className="flex flex-col md:flex-row md:space-x-4 mt-4">
+            {/* Announcements */}
             <div className="w-full md:w-2/3 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
               <UserBulletinBoard />
             </div>
 
+            {/* Clock In/Out and Break Section */}
             <div className="w-full md:w-1/3 flex flex-col space-y-4">
+              {/* Clock In/Out */}
               <div className="space-y-2">
-                <button
-                  className={`w-full py-2 px-4 rounded ${
-                    isClockedIn
-                      ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
-                      : "bg-green-600 text-white"
-                  }`}
-                  onClick={() =>
-                    handleClockIn(
-                      userId,
-                      setClockInTime,
-                      setIsClockedIn,
-                      addLog
-                    )
-                  }
-                  disabled={isClockedIn}
-                >
-                  Clock In
-                </button>
-                <button
-                  className={`w-full py-2 px-4 rounded ${
-                    !isClockedIn
-                      ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
-                      : "bg-red-600 text-white"
-                  }`}
-                  onClick={() =>
-                    handleClockOut(
-                      userId,
-                      setIsClockedIn,
-                      setTotalBreakDuration,
-                      addLog,
-                      clockInTime,
-                      totalBreakDuration,
-                      isOnBreak,
-                      breakTimer,
-                      setIsOnBreak
-                    )
-                  }
-                  disabled={!isClockedIn}
-                >
-                  Clock Out
-                </button>
+                {!isClockedIn ? (
+                  <button
+                    className={`w-full h-full py-10 text-4xl px-4 rounded-full ${
+                      isClockedIn
+                        ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                        : "bg-green-600 text-white"
+                    }`}
+                    onClick={() =>
+                      handleClockIn(
+                        userId,
+                        setClockInTime,
+                        setIsClockedIn,
+                        addLog,
+                        setIsLoading
+                      )
+                    }
+                    disabled={isClockedIn}
+                  >
+                    Clock In
+                  </button>
+                ) : (
+                  <button
+                    className={`w-full h-full py-10 text-4xl px-4 rounded-full ${
+                      !isClockedIn
+                        ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                        : "bg-red-600 text-white"
+                    }`}
+                    onClick={() =>
+                      handleClockOut(
+                        userId,
+                        setIsClockedIn,
+                        setTotalBreakDuration,
+                        addLog,
+                        clockInTime,
+                        totalBreakDuration,
+                        isOnBreak,
+                        breakTimer,
+                        setIsOnBreak
+                      )
+                    }
+                    disabled={!isClockedIn}
+                  >
+                    Clock Out
+                  </button>
+                )}
               </div>
 
-              {/*Break section*/}
+              {/* Break Section */}
               <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-4xl mx-auto">
                 <div className="flex flex-col md:flex-row gap-4 mb-4 flex-wrap">
                   {/* Select Break Time */}
@@ -309,50 +323,55 @@ const Employee = () => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div className="space-y-2">
-                <button
-                  className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
-                  onClick={() => setShowContactModal(true)}
-                >
-                  Contact Admins
-                </button>
-                <button
-                  className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
-                  onClick={() => setSentFormsModal(true)}
-                >
-                  View Sent Contact Forms
-                </button>
-                <button
-                  className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
-                  onClick={() => setShowPasswordModal(true)}
-                >
-                  Change Password
-                </button>
-              </div>
+          {/* Additional Buttons */}
+          <div className="flex flex-col space-y-2 mt-4">
+            <div className="flex flex-row gap-4">
+              <button
+                className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                onClick={() => setShowContactModal(true)}
+              >
+                Contact Admins
+              </button>
+              <button
+                className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                onClick={() => setSentFormsModal(true)}
+              >
+                View Sent Contact Forms
+              </button>
+              <button
+                className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                onClick={() => setShowPasswordModal(true)}
+              >
+                Change Password
+              </button>
             </div>
           </div>
 
           <WorkHours employeeId={userId} />
 
-          <div className="mt-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
-            <table className="w-full text-left text-gray-900 dark:text-gray-100">
-              <thead>
-                <tr className="border-b dark:border-gray-700">
-                  <th className="py-2 px-4">Time</th>
-                  <th className="py-2 px-4">Message</th>
-                </tr>
-              </thead>
-              <tbody>
-                {log.map((entry, index) => (
-                  <tr key={index} className="border-b dark:border-gray-700">
-                    <td className="py-2 px-4">{entry.time}</td>
-                    <td className="py-2 px-4">{entry.message}</td>
+          {log.length > 0 && (
+            <div className="mt-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+              <table className="w-full text-left text-gray-900 dark:text-gray-100">
+                <thead>
+                  <tr className="border-b dark:border-gray-700">
+                    <th className="py-2 px-4">Time</th>
+                    <th className="py-2 px-4">Message</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {log.map((entry, index) => (
+                    <tr key={index} className="border-b dark:border-gray-700">
+                      <td className="py-2 px-4">{entry.time}</td>
+                      <td className="py-2 px-4">{entry.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           <button
             className="mt-4 w-full py-2 px-4 bg-red-600 dark:bg-red-700 text-white rounded"
@@ -361,6 +380,33 @@ const Employee = () => {
             Log Out
           </button>
         </div>
+
+        {isLoading && (
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="text-white text-lg">
+              <svg
+                className="animate-spin h-8 w-8 mx-auto"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="none"
+                  d="M4 12a8 8 0 0116 0"
+                ></path>
+              </svg>
+              <p className="mt-2">Checking Location</p>
+            </div>
+          </div>
+        )}
 
         <ChangePasswordModal
           userId={userId}
