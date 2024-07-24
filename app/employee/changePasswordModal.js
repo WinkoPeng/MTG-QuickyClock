@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import db from "../firebase";
+import bcrypt from "bcryptjs";
 
 const ChangePasswordModal = ({
   userId,
@@ -34,23 +35,25 @@ const ChangePasswordModal = ({
       );
       const querySnapshot = await getDocs(employeeQuery);
 
-      if (querySnapshot.empty) {
-        alert("Employee ID does not exist");
-        return;
-      }
-
       const employeeDoc = querySnapshot.docs[0];
       const employeeData = employeeDoc.data();
 
-      if (employeeData.password !== currentPassword) {
+      if (
+        !bcrypt.compareSync(currentPassword, employeeData.password) &&
+        !(currentPassword == employeeData.password)
+      ) {
         alert("Current password is incorrect.");
         return;
       }
 
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(newPassword, salt);
+      console.log("Hashed password: ", hash);
+
       const docRef = doc(db, "employee", employeeDoc.id);
 
       await updateDoc(docRef, {
-        password: newPassword,
+        password: hash,
       });
 
       alert("Password changed successfully!");

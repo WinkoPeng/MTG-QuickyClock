@@ -15,6 +15,7 @@ import db from "./firebase";
 import { DateTime } from "luxon";
 import mtglogo from "../public/images/MTGBCSLogo.jpg";
 import { updateWorkDuration } from "./employee/timer";
+import { verifyUser } from "./employee/auth";
 
 export default function Home() {
   const router = useRouter();
@@ -41,25 +42,24 @@ export default function Home() {
   }, []);
 
   const handleLogin = async () => {
-    const mtgId = document.getElementById("mtgId").value;
-    const password = document.getElementById("password").value;
+    try {
+      const mtgId = document.getElementById("mtgId").value;
+      const password = document.getElementById("password").value;
 
-    const q = query(
-      collection(db, "employee"),
-      where("id", "==", mtgId),
-      where("password", "==", password)
-    );
-    const querySnapshot = await getDocs(q);
+      const verifiedUser = await verifyUser(mtgId, password);
 
-    if (!querySnapshot.empty) {
-      const userData = querySnapshot.docs[0].data();
-      localStorage.setItem("userName", userData.name);
-      localStorage.setItem("userId", mtgId); // Store user ID
-      //updateWorkDuration(mtgId); // Continue updating work duration if user is online
-      router.push("/employee");
-    } else {
-      console.error("Invalid credentials");
-      alert("Invalid credentials");
+      if (verifiedUser) {
+        const userData = verifiedUser;
+        localStorage.setItem("userName", userData.name);
+        localStorage.setItem("userId", mtgId); // Store user ID
+        //updateWorkDuration(mtgId); // Continue updating work duration if user is online
+        router.push("/employee");
+      } else {
+        console.error("Invalid credentials");
+        alert("Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
     }
   };
 
@@ -67,15 +67,10 @@ export default function Home() {
     const mtgId = document.getElementById("mtgId").value;
     const password = document.getElementById("password").value;
 
-    const q = query(
-      collection(db, "employee"),
-      where("id", "==", mtgId),
-      where("password", "==", password)
-    );
-    const querySnapshot = await getDocs(q);
+    const verifiedUser = await verifyUser(mtgId, password);
 
-    if (!querySnapshot.empty) {
-      const userData = querySnapshot.docs[0].data();
+    if (verifiedUser) {
+      const userData = verifiedUser;
       if (userData.class === "admin") {
         localStorage.setItem("adminName", userData.name); // Store admin name
         localStorage.setItem("userId", mtgId); // Store user ID
