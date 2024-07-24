@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import GeofenceDisplay from "./geofenceDisplay";
-import GeofenceSetup from "./geofenceSetup";
+const GeofenceSetup = dynamic(() => import("./geofenceSetup"), {
+  ssr: false,
+});
 
 const GeofenceManager = () => {
   // State to manage the active view

@@ -8,7 +8,7 @@ import Register from "./register";
 import EmployeeList from "./employeeList";
 import Dashboard from "./dashboard";
 import Edit from "./edit";
-import GeofenceManager from "./geofenceManager"; // Import the new combined component
+import GeofenceManager from "./geofenceManager";
 import Contact from "./contact";
 import Bulletin from "./bulletin";
 import Sidebar from "./sidebar";
@@ -16,7 +16,7 @@ import Sidebar from "./sidebar";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import db from "../firebase";
 
-function Admin() {
+const Admin = () => {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
   const [adminName, setAdminName] = useState("");
   const [userId, setUserId] = useState("");
@@ -109,6 +109,6 @@ function Admin() {
       </div>
     </div>
   );
-}
+};
 
 export default withAuth(Admin);
