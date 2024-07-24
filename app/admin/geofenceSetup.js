@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from "react";
 import { SearchBox } from "@mapbox/search-js-react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import styles from "./admin.module.css";
 import {
   collection,
   addDoc,
@@ -123,44 +122,70 @@ export default function GeofenceSetup() {
   };
 
   return (
-    <>
-      <SearchBox
-        accessToken={accessToken}
-        map={mapInstanceRef.current}
-        mapboxgl={mapboxgl}
-        value={inputValue}
-        onChange={(d) => {
-          setInputValue(d);
-        }}
-        onRetrieve={handleRetrieve}
-        marker={false}
-      />
-      <div
-        id="map-container"
-        ref={mapContainerRef}
-        style={{ height: "75%", width: "100%" }}
-      />
-      {selectedLocation && (
-        <div>
-          <h3>Selected Location:</h3>
-          <p>Place name: {selectedLocation.properties.name}</p>
-          <p>Address: {selectedLocation.properties.full_address}</p>
-          <form onSubmit={handleAddGeofence}>
-            <input
-              type="text"
-              name="Geofence Name"
-              placeholder="Location Name"
-              value={geofenceName}
-              onChange={(e) => setGeofenceName(e.target.value)}
-              required
-              className={styles.input}
-            />
-            <button type="submit" className={styles.button}>
-              Add Location
-            </button>
-          </form>
-        </div>
-      )}
-    </>
+    <div className="flex flex-col md:flex-row p-4 gap-4">
+      {/* Map Container */}
+      <div className="relative flex-1 h-[400px] md:h-[75vh] bg-gray-800 rounded-lg shadow-md">
+        <SearchBox
+          accessToken={accessToken}
+          map={mapInstanceRef.current}
+          mapboxgl={mapboxgl}
+          value={inputValue}
+          onChange={(d) => {
+            setInputValue(d);
+          }}
+          onRetrieve={handleRetrieve}
+          marker={false}
+        />
+        <div
+          id="map-container"
+          ref={mapContainerRef}
+          className="absolute top-0 left-0 w-full h-full rounded-lg"
+        />
+      </div>
+
+      {/* Form Container */}
+      <div className="flex-1 max-w-md p-4 bg-gray-900 text-gray-200 rounded-lg shadow-lg">
+        {!selectedLocation && (
+          <div className="mb-4 p-4 border border-dashed border-gray-700 rounded-md text-center bg-gray-800">
+            <p className="text-gray-400">
+              Please search for a location, then double-click on the intended
+              result in the resulting list.
+            </p>
+          </div>
+        )}
+        {selectedLocation && (
+          <>
+            <h3 className="text-lg font-semibold mb-4">Selected Location</h3>
+            <p className="text-gray-300">
+              <strong>Place name:</strong> {selectedLocation.properties.name}
+            </p>
+            <p className="text-gray-300">
+              <strong>Address:</strong>{" "}
+              {selectedLocation.properties.full_address}
+            </p>
+            <form
+              onSubmit={handleAddGeofence}
+              className="mt-4 flex flex-col gap-4"
+            >
+              <input
+                type="text"
+                name="Geofence Name"
+                placeholder="Name your geofence"
+                value={geofenceName}
+                onChange={(e) => setGeofenceName(e.target.value)}
+                required
+                className="p-3 border border-gray-700 rounded-md bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Add Location
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

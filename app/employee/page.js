@@ -3,20 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { DateTime } from "luxon";
-import {
-  query,
-  where,
-  getDocs,
-  collection,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { query, where, getDocs, collection } from "firebase/firestore";
 import db from "../firebase";
-import Contact from "./contact";
-import SentForms from "./sentForms";
 import WorkHours from "./workHours";
-import styles from "./employee.module.css";
 import withAuth from "../withAuth";
+import ChangePasswordModal from "./changePasswordModal";
+import UserBulletinBoard from "./bulletin";
+import SentForms from "./sentForms";
+import Contact from "./contact";
 import {
   handleClockIn,
   handleClockOut,
@@ -24,7 +18,7 @@ import {
   handleStartBreak,
   formatWorkDuration,
 } from "./timer";
-import UserBulletinBoard from "./bulletin";
+import styles from "./employee.module.css";
 
 const Employee = () => {
   const router = useRouter();
@@ -35,7 +29,7 @@ const Employee = () => {
   );
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
-  const [breakTime, setBreakTime] = useState("15"); // 初始化为 15 分钟
+  const [breakTime, setBreakTime] = useState("15");
   const [customBreakTime, setCustomBreakTime] = useState("");
   const [selectedOption, setSelectedOption] = useState("select");
   const [log, setLog] = useState([]);
@@ -49,14 +43,7 @@ const Employee = () => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showSentFormsModal, setSentFormsModal] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [workDurationToday, setWorkDurationToday] = useState(0); // 新增状态
-
-  const [bulletins, setBulletins] = useState([]);
-  const [showBulletinOverlay, setShowBulletinOverlay] = useState(false);
-  const [newestBulletin, setNewestBulletin] = useState(null);
 
   const addLog = useCallback(
     (message) => {
@@ -160,315 +147,163 @@ const Employee = () => {
     );
   };
 
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    if (newPassword !== confirmNewPassword) {
-      alert("New password and confirm new password do not match.");
-      return;
-    }
-
+  const handleLogout = async () => {
     try {
-      const employeeQuery = query(
-        collection(db, "employee"),
-        where("id", "==", userId)
-      );
-      const querySnapshot = await getDocs(employeeQuery);
-
-      if (querySnapshot.empty) {
-        alert("Employee ID does not exist");
-        return;
-      }
-
-      const employeeDoc = querySnapshot.docs[0];
-      const employeeData = employeeDoc.data();
-
-      if (employeeData.password !== currentPassword) {
-        alert("Current password is incorrect.");
-        return;
-      }
-
-      const docRef = doc(db, "employee", employeeDoc.id);
-
-      await updateDoc(docRef, {
-        password: newPassword,
-      });
-
-      alert("Password changed successfully!");
-      setShowPasswordModal(false);
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userId");
+      router.push("/");
     } catch (error) {
-      console.error("Error updating password: ", error);
-      alert("Error updating password.");
+      console.error("Error during logout:", error);
     }
-  };
-
-  const handleLogout = () => {
-    router.push("/");
-  };
-
-  const formatWorkDuration = (duration) => {
-    if (duration === 0) {
-      return "0 h 0 m";
-    }
-    const hours = Math.floor(duration / 60);
-    const minutes = duration % 60;
-    return `${hours} h ${minutes} m`;
   };
 
   return (
-    <div className={styles.container}>
-      <title>MTG - Employee</title>
-      <div
-        className={`overflow-y-auto
-      [&::-webkit-scrollbar]:w-2
-      [&::-webkit-scrollbar-track]:bg-gray-100
-      [&::-webkit-scrollbar-thumb]:bg-gray-300
-      dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 ${styles.formContainer}`}
-      >
-        <div className="p-6 space-y-4 bg-white shadow-md rounded-lg">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-            {greeting}, {userName}!
+    <div className="dark:bg-gray-900">
+      <div className="container mx-auto dark:bg-gray-900">
+        <title>MTG - Employee</title>
+        <div className="bg-white min-w-full dark:bg-gray-900 p-4 shadow-lg">
+          <h1 className="text-2xl text-center font-bold mb-2 text-gray-900 dark:text-gray-100">
+            {greeting}, {userName}
           </h1>
-
-          <div className="text-lg text-gray-800 dark:text-gray-200">
-            <p>
-              Current Time: <span className="font-semibold">{currentTime}</span>
-            </p>
-            <p>
-              Auto Logout In:{" "}
-              <span className="font-semibold text-blue-600 dark:text-blue-400">
-                {Math.floor(autoLogoutTime / 60)}:
-                {String(autoLogoutTime % 60).padStart(2, "0")}
-              </span>
-            </p>
-            <p>
-              Today&apos;s Work Duration:{" "}
-              <span className="font-semibold">
-                {formatWorkDuration(workDurationToday)}
-              </span>
-            </p>
-          </div>
-        </div>
-        <div className="w-full max-w-xl bg-white p-4 rounded-lg shadow-lg">
-          <UserBulletinBoard />
-        </div>
-        <div className={styles.buttonAndBreakGroup}>
-          <div className={styles.buttonGroup}>
-            <button
-              className={`${styles.clockInButton} ${
-                isClockedIn ? styles.disabledButton : ""
-              }`}
-              onClick={() =>
-                handleClockIn(userId, setClockInTime, setIsClockedIn, addLog)
-              }
-              disabled={isClockedIn}
-            >
-              Clock In
-            </button>
-            <button
-              className={`${styles.clockOutButton} ${
-                !isClockedIn ? styles.disabledButton : ""
-              }`}
-              onClick={() =>
-                handleClockOut(
-                  userId,
-                  setIsClockedIn,
-                  setTotalBreakDuration,
-                  addLog,
-                  clockInTime,
-                  totalBreakDuration,
-                  isOnBreak,
-                  breakTimer,
-                  setIsOnBreak
-                )
-              }
-              disabled={!isClockedIn}
-            >
-              Clock Out
-            </button>
-            <button
-              className={styles.changePasswordButton}
-              onClick={() => setShowContactModal(true)}
-            >
-              Contact Admins
-            </button>
-
-            <button
-              className={styles.changePasswordButton}
-              onClick={() => setSentFormsModal(true)}
-            >
-              View Sent Contact Forms
-            </button>
-            <button
-              className={styles.changePasswordButton}
-              onClick={() => setShowPasswordModal(true)}
-            >
-              Change Password
-            </button>
-          </div>
-          <div className={styles.breakGroup}>
-            <div className={styles.breakOption}>
-              <input
-                type="radio"
-                name="breakOption"
-                value="select"
-                checked={selectedOption === "select"}
-                onChange={handleOptionChange}
-                disabled={!isClockedIn}
-              />
-              <select
-                className={styles.breakSelect}
-                value={breakTime}
-                onChange={handleBreakTimeChange}
-                disabled={selectedOption !== "select" || !isClockedIn}
-              >
-                <option value="15">15 min</option>
-                <option value="30">30 min</option>
-                <option value="45">45 min</option>
-                <option value="60">60 min</option>
-              </select>
+          <div className="flex flex-col md:flex-row md:space-x-4 mt-4">
+            <div className="text-lg bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+              <p className="text-gray-900 dark:text-gray-100">
+                Current Time:{" "}
+                <span className="font-semibold">{currentTime}</span>
+              </p>
+              <p className="text-gray-900 dark:text-gray-100">
+                Auto Logout In:{" "}
+                <span className="font-semibold text-blue-600 dark:text-blue-400">
+                  {Math.floor(autoLogoutTime / 60)}:
+                  {String(autoLogoutTime % 60).padStart(2, "0")}
+                </span>
+              </p>
+              <p className="text-gray-900 dark:text-gray-100">
+                Today&apos;s Work Duration:{" "}
+                <span className="font-semibold text-green-600 dark:text-green-400">
+                  {formatWorkDuration(workDurationToday)}
+                </span>
+              </p>
             </div>
-            <div className={styles.breakOption}>
-              <input
-                type="radio"
-                name="breakOption"
-                value="custom"
-                checked={selectedOption === "custom"}
-                onChange={handleOptionChange}
-                disabled={!isClockedIn}
-              />
-              <input
-                type="number"
-                className={styles.breakInput}
-                placeholder="Custom"
-                value={customBreakTime}
-                onChange={handleCustomBreakTimeChange}
-                disabled={selectedOption !== "custom" || !isClockedIn}
-                min="1"
-              />
+
+            <div className="w-full md:w-2/3 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+              <UserBulletinBoard />
             </div>
-            <button
-              className={`${styles.startBreakButton} ${
-                !isClockedIn || isOnBreak ? styles.disabledButton : ""
-              }`}
-              onClick={handleStartBreakClick}
-              disabled={!isClockedIn || isOnBreak}
-            >
-              Start Break
-            </button>
-          </div>
-        </div>
-        <WorkHours employeeId={userId} />
-        <div className={styles.log}>
-          <table className={styles.logTable}>
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Message</th>
-              </tr>
-            </thead>
 
-            <tbody>
-              {log.map((entry, index) => (
-                <tr key={index}>
-                  <td>{entry.time}</td>
-                  <td>{entry.message}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <button className={styles.logoutButton} onClick={handleLogout}>
-          Log Out
-        </button>
-      </div>
-
-      {/* Bulletin Overlay */}
-      {showBulletinOverlay && (
-        <div className={styles.overlay}>
-          <div className={styles.overlayContent}>
-            <h2>All Bulletins</h2>
-            <button
-              className={styles.closeButton}
-              onClick={() => setShowBulletinOverlay(false)}
-            >
-              Close
-            </button>
-            <ul className={styles.bulletinList}>
-              {bulletins.map((bulletin) => (
-                <li key={bulletin.id} className={styles.bulletinItem}>
-                  <h3>{bulletin.title}</h3>
-                  <p>By: {bulletin.author}</p>
-                  <p>
-                    {new Date(bulletin.createdAt.toDate()).toLocaleString()}
-                  </p>
-                  <p>{bulletin.message}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {showContactModal && (
-        <div className={styles.passwordModal}>
-          <div className={styles.passwordModalContent}>
-            <Contact userId={userId} name={userName} />
-            <button onClick={() => setShowContactModal(false)}>Close</button>
-          </div>
-        </div>
-      )}
-
-      {showSentFormsModal && (
-        <div className={styles.passwordModal}>
-          <div className={styles.passwordModalContent}>
-            <SentForms userId={userId} />
-            <button onClick={() => setSentFormsModal(false)}>Close</button>
-          </div>
-        </div>
-      )}
-
-      {showPasswordModal && (
-        <div className={styles.passwordModal}>
-          <div className={styles.passwordModalContent}>
-            <form onSubmit={handlePasswordChange}>
-              <div className={styles.formGroup}>
-                <label>Current Password:</label>
-                <input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>New Password:</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Confirm New Password:</label>
-                <input
-                  type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                />
-              </div>
-              <div className={styles.passwordModalButtons}>
-                <button type="submit">Confirm</button>
+            <div className="w-full md:w-1/3 flex flex-col space-y-4">
+              <div className="space-y-2">
                 <button
-                  type="button"
-                  onClick={() => setShowPasswordModal(false)}
+                  className={`w-full py-2 px-4 rounded ${
+                    isClockedIn
+                      ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                      : "bg-blue-600 text-white"
+                  }`}
+                  onClick={() =>
+                    handleClockIn(
+                      userId,
+                      setClockInTime,
+                      setIsClockedIn,
+                      addLog
+                    )
+                  }
+                  disabled={isClockedIn}
                 >
-                  Cancel
+                  Clock In
+                </button>
+                <button
+                  className={`w-full py-2 px-4 rounded ${
+                    !isClockedIn
+                      ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                      : "bg-red-600 text-white"
+                  }`}
+                  onClick={() =>
+                    handleClockOut(
+                      userId,
+                      setIsClockedIn,
+                      setTotalBreakDuration,
+                      addLog,
+                      clockInTime,
+                      totalBreakDuration,
+                      isOnBreak,
+                      breakTimer,
+                      setIsOnBreak
+                    )
+                  }
+                  disabled={!isClockedIn}
+                >
+                  Clock Out
                 </button>
               </div>
-            </form>
+
+              <div className="space-y-2">
+                <button
+                  className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  onClick={() => setShowContactModal(true)}
+                >
+                  Contact Admins
+                </button>
+                <button
+                  className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  onClick={() => setSentFormsModal(true)}
+                >
+                  View Sent Contact Forms
+                </button>
+                <button
+                  className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  onClick={() => setShowPasswordModal(true)}
+                >
+                  Change Password
+                </button>
+              </div>
+            </div>
           </div>
+
+          <WorkHours employeeId={userId} />
+
+          <div className="mt-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+            <table className="w-full text-left text-gray-900 dark:text-gray-100">
+              <thead>
+                <tr className="border-b dark:border-gray-700">
+                  <th className="py-2 px-4">Time</th>
+                  <th className="py-2 px-4">Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                {log.map((entry, index) => (
+                  <tr key={index} className="border-b dark:border-gray-700">
+                    <td className="py-2 px-4">{entry.time}</td>
+                    <td className="py-2 px-4">{entry.message}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <button
+            className="mt-4 w-full py-2 px-4 bg-red-600 dark:bg-red-700 text-white rounded"
+            onClick={handleLogout}
+          >
+            Log Out
+          </button>
         </div>
-      )}
+
+        <ChangePasswordModal
+          userId={userId}
+          showPasswordModal={showPasswordModal}
+          setShowPasswordModal={setShowPasswordModal}
+        />
+        <Contact
+          userId={userId}
+          name={userName}
+          showContactModal={showContactModal}
+          setShowContactModal={setShowContactModal}
+        />
+        <SentForms
+          userId={userId}
+          showSentFormsModal={showSentFormsModal}
+          setSentFormsModal={setSentFormsModal}
+        />
+      </div>
     </div>
   );
 };

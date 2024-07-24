@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.5",
     "@mapbox/search-js-react": "^1.0.0-beta.21",
     "@turf/turf": "^7.0.0",
     "chart.js": "^4.4.3",

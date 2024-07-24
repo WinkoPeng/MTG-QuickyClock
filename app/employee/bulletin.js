@@ -7,6 +7,7 @@ import db from "../firebase";
 const UserBulletinBoard = () => {
   const [bulletins, setBulletins] = useState([]);
   const [showAll, setShowAll] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const fetchBulletins = async () => {
@@ -41,25 +42,43 @@ const UserBulletinBoard = () => {
   const latestBulletin = bulletins.length > 0 ? bulletins[0] : null;
 
   return (
-    <div className="relative p-4 bg-gray-100">
-      <h1 className="text-2xl font-bold mb-4">Bulletin Board</h1>
+    <div className="relative rounded-lg p-4 bg-gray-100 dark:bg-gray-900">
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        Bulletin Board
+      </h1>
 
       {latestBulletin && !showAll ? (
-        <div className="p-3 bg-white shadow-md rounded-lg mb-4">
+        <div className="p-3 bg-white dark:bg-gray-800 shadow-md rounded-lg mb-4">
           {/* Latest bulletin preview */}
           <div className="mb-1">
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
               {latestBulletin.title}
             </h2>
-            <p className="text-xs text-gray-600">By: {latestBulletin.author}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              By: {latestBulletin.author}
+            </p>
           </div>
-          <p className="text-gray-700 mb-1">{latestBulletin.message}</p>
-          <p className="text-xs text-gray-500">
+          <p
+            className={`text-gray-700 dark:text-gray-300 mb-1 ${
+              !expanded ? "line-clamp-3" : ""
+            }`}
+          >
+            {latestBulletin.message}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-500">
             {new Date(latestBulletin.createdAt.toDate()).toLocaleString()}
           </p>
+          {latestBulletin.message.length > 200 && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="mt-2 px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 text-sm"
+            >
+              {expanded ? "Show Less" : "Read More"}
+            </button>
+          )}
           <button
             onClick={() => setShowAll(true)}
-            className="mt-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+            className="mt-2 ml-2 px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 text-sm"
           >
             Show All Messages
           </button>
@@ -69,10 +88,10 @@ const UserBulletinBoard = () => {
       {/* Full list overlay */}
       {showAll && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-lg max-h-[80vh] overflow-y-auto relative">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-lg max-h-[80vh] overflow-y-auto relative">
             <button
               onClick={() => setShowAll(false)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+              className="absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
               aria-label="Close"
             >
               <svg
@@ -90,23 +109,27 @@ const UserBulletinBoard = () => {
                 />
               </svg>
             </button>
-            <h2 className="text-xl font-bold mb-4">All Bulletins</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+              All Bulletins
+            </h2>
             <ul className="space-y-2">
               {bulletins.map((bulletin) => (
                 <li
                   key={bulletin.id}
-                  className="p-2 bg-gray-50 shadow-md rounded-lg"
+                  className="p-2 bg-gray-50 dark:bg-gray-700 shadow-md rounded-lg"
                 >
                   <div className="mb-1">
-                    <h3 className="text-lg font-semibold text-gray-800">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       {bulletin.title}
                     </h3>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
                       By: {bulletin.author}
                     </p>
                   </div>
-                  <p className="text-gray-700 mb-1">{bulletin.message}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-gray-700 dark:text-gray-300 mb-1">
+                    {bulletin.message}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500">
                     {new Date(bulletin.createdAt.toDate()).toLocaleString()}
                   </p>
                 </li>

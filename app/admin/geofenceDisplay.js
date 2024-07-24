@@ -35,29 +35,29 @@ const GeofenceDisplay = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-gray-900 text-gray-200">
       <h2 className="text-2xl font-semibold mb-4">Geofences</h2>
       {geofences.length > 0 ? (
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-          <thead className="bg-gray-100 border-b border-gray-200">
+        <table className="min-w-full bg-gray-800 border border-gray-700 rounded-lg shadow-md">
+          <thead className="bg-gray-700 border-b border-gray-600">
             <tr>
-              <th className="px-6 py-3 text-left text-gray-600">Name</th>
-              <th className="px-6 py-3 text-left text-gray-600">Address</th>
-              <th className="px-6 py-3 text-left text-gray-600"></th>
+              <th className="px-6 py-3 text-left text-gray-300">Name</th>
+              <th className="px-6 py-3 text-left text-gray-300">Address</th>
+              <th className="px-6 py-3 text-left text-gray-300"></th>
             </tr>
           </thead>
           <tbody>
             {geofences.map((geofence) => (
               <tr
                 key={geofence.id}
-                className="border-b border-gray-200 hover:bg-gray-50"
+                className="border-b border-gray-700 hover:bg-gray-600"
               >
-                <td className="px-6 py-4 text-gray-800">{geofence.name}</td>
-                <td className="px-6 py-4 text-gray-800">{geofence.address}</td>
+                <td className="px-6 py-4 text-gray-200">{geofence.name}</td>
+                <td className="px-6 py-4 text-gray-200">{geofence.address}</td>
                 <td className="px-6 py-4">
                   <button
                     onClick={() => handleDelete(geofence.id)}
-                    className="bg-red-500 text-white py-1 px-3 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="bg-red-600 text-white py-1 px-3 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                   >
                     Delete
                   </button>
@@ -67,7 +67,7 @@ const GeofenceDisplay = () => {
           </tbody>
         </table>
       ) : (
-        <p className="text-gray-500">No geofences available</p>
+        <p className="text-gray-400">No geofences available</p>
       )}
     </div>
   );

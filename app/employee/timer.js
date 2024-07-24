@@ -146,6 +146,7 @@ const handleClockIn = async (
     alert("You are not within the allowed location to clock in.");
     return;
   }
+
   const q = query(collection(db, "employee"), where("id", "==", userId));
   try {
     const querySnapshot = await getDocs(q);
@@ -193,15 +194,12 @@ const handleClockIn = async (
 
       await updateDoc(userRef, {
         status: "online",
-        workDurationToday: 0,
         workTime: updatedWorkTime,
         totalBreakDuration: 0,
         isOnBreak: false,
       });
 
-      console.log(
-        "User status set to online and workDurationToday initialized."
-      );
+      console.log("User status set to online and work duration initialized.");
       startInterval(userId, setWorkDurationToday);
     } else {
       console.log(`User document does not exist for ID: ${userId}`);
@@ -238,18 +236,24 @@ const handleClockOut = async (
 
       const today = now.toISODate();
       const clockInEntry = userData.workTime[today];
-      const startTime = DateTime.fromISO(clockInEntry, {
+
+      // Handling case where the clock-out happens after midnight
+      const clockInDateTime = DateTime.fromISO(clockInEntry, {
         zone: "America/Edmonton",
       });
+
       let totalWorkDurationToday = Math.round(
-        now.diff(startTime, "minutes").minutes -
+        clockOutTime.diff(clockInDateTime, "minutes").minutes -
           (userData.totalBreakDuration || 0)
       );
 
-      // 确保工作时长不为负数
+      // Ensure work duration is not negative
       if (totalWorkDurationToday < 0) {
         totalWorkDurationToday = 0;
       }
+
+      const previousWorkDuration = userData.workPeriod[today] || 0;
+      totalWorkDurationToday += previousWorkDuration;
 
       const updatedWorkPeriod = {
         ...userData.workPeriod,
@@ -262,16 +266,29 @@ const handleClockOut = async (
 
       await updateDoc(userRef, {
         status: "offline",
-        lastOnlineDate: today, // 仅保存日期
+        lastOnlineDate: today, // Only save the date
         isOnBreak: false,
         workDurationToday: totalWorkDurationToday,
         workPeriod: updatedWorkPeriod,
         workTime: updatedWorkTime,
       });
 
+      // Handle work duration for the next day if needed
+      if (clockOutTime.startOf("day") > clockInDateTime.startOf("day")) {
+        const nextDay = clockOutTime.plus({ days: 1 }).toISODate();
+        const nextDayWorkDuration = userData.workPeriod[nextDay] || 0;
+
+        await updateDoc(userRef, {
+          workPeriod: {
+            ...userData.workPeriod,
+            [nextDay]: nextDayWorkDuration + totalWorkDurationToday,
+          },
+        });
+      }
+
       console.log("User status set to offline and work duration updated.");
       setWorkDurationToday(totalWorkDurationToday);
-      setIsOnBreak(false); // 恢复休息按钮
+      setIsOnBreak(false); // Reset break button
     } else {
       console.log(`User document does not exist for ID: ${userId}`);
     }

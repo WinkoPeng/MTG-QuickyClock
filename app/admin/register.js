@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import db from "../firebase";
-import styles from "./admin.module.css";
 
 function Register() {
   const [options, setOptions] = useState([]);
@@ -24,7 +23,7 @@ function Register() {
     password: "",
     name: "",
     class: "employee",
-    title: "Administrative Officer", // Add title field
+    title: "Administrative Officer",
     gender: "male",
     email: "",
     cell: "",
@@ -61,7 +60,6 @@ function Register() {
         ...prevData,
         [name]: value,
       }));
-      console.log(formData);
     }
   };
 
@@ -144,7 +142,7 @@ function Register() {
         password: "",
         name: "",
         class: "employee",
-        title: "Administrative Officer", // Reset title field
+        title: "Administrative Officer",
         gender: "male",
         email: "",
         cell: "",
@@ -158,7 +156,7 @@ function Register() {
           Saturday: { start: "", end: "" },
           Sunday: { start: "", end: "" },
         },
-        workPeriod: [], // Reset workPeriod field
+        workPeriod: [],
         geofence: "",
       });
     } catch (error) {
@@ -168,8 +166,10 @@ function Register() {
   };
 
   return (
-    <div className={styles.register}>
-      <h2 className="text-2xl font-bold mb-4">Register Employee</h2>
+    <div className="p-6 max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        Register Employee
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
           <input
@@ -180,11 +180,11 @@ function Register() {
             value={formData.id}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600 focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm placeholder-transparent focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           />
           <label
             htmlFor="id"
-            className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent origin-[0_0] dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:scale-90 peer-focus:translate-x-0.5 peer-focus:-translate-y-1.5 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:translate-x-0.5 peer-[:not(:placeholder-shown)]:-translate-y-1.5 peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
             ID
           </label>
@@ -199,11 +199,11 @@ function Register() {
             value={formData.password}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600 focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm placeholder-transparent focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           />
           <label
             htmlFor="password"
-            className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent origin-[0_0] dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:scale-90 peer-focus:translate-x-0.5 peer-focus:-translate-y-1.5 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:translate-x-0.5 peer-[:not(:placeholder-shown)]:-translate-y-1.5 peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
             Password
           </label>
@@ -218,11 +218,11 @@ function Register() {
             value={formData.name}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600 focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm placeholder-transparent focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           />
           <label
             htmlFor="name"
-            className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent origin-[0_0] dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:scale-90 peer-focus:translate-x-0.5 peer-focus:-translate-y-1.5 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:translate-x-0.5 peer-[:not(:placeholder-shown)]:-translate-y-1.5 peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
             Name
           </label>
@@ -235,25 +235,14 @@ function Register() {
             value={formData.class}
             onChange={handleChange}
             required
-            className="peer p-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:ring-neutral-600
-  focus:pt-6
-  focus:pb-2
-  [&:not(:placeholder-shown)]:pt-6
-  [&:not(:placeholder-shown)]:pb-2
-  autofill:pt-6
-  autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           >
             <option value="employee">Employee</option>
             <option value="admin">Admin</option>
           </select>
           <label
-            className="absolute top-0 start-0 p-4 h-full truncate pointer-events-none transition ease-in-out duration-100 border border-transparent dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none
-    peer-focus:text-xs
-    peer-focus:-translate-y-1.5
-    peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-    peer-[:not(:placeholder-shown)]:text-xs
-    peer-[:not(:placeholder-shown)]:-translate-y-1.5
-    peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            htmlFor="class"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
             Employee Type
           </label>
@@ -266,32 +255,19 @@ function Register() {
             value={formData.title}
             onChange={handleChange}
             required
-            className="peer p-4 pe-9 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600
-  focus:pt-6
-  focus:pb-2
-  [&:not(:placeholder-shown)]:pt-6
-  [&:not(:placeholder-shown)]:pb-2
-  autofill:pt-6
-  autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           >
             <option value="Administrative Officer">
               Administrative Officer
             </option>
-            <option value="Program Coordinator">Program Coordinator</option>
-            <option value="Instructor">Instructor</option>
-            <option value="Receptionist">Receptionist</option>
+            <option value="Manager">Manager</option>
+            <option value="Clerk">Clerk</option>
           </select>
           <label
             htmlFor="title"
-            className="absolute top-0 start-0 p-4 h-full truncate pointer-events-none transition ease-in-out duration-100 border border-transparent dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none
-    peer-focus:text-xs
-    peer-focus:-translate-y-1.5
-    peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-    peer-[:not(:placeholder-shown)]:text-xs
-    peer-[:not(:placeholder-shown)]:-translate-y-1.5
-    peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
-            Job Title
+            Title
           </label>
         </div>
 
@@ -302,25 +278,15 @@ function Register() {
             value={formData.gender}
             onChange={handleChange}
             required
-            className="peer p-4 pe-9 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600
-  focus:pt-6
-  focus:pb-2
-  [&:not(:placeholder-shown)]:pt-6
-  [&:not(:placeholder-shown)]:pb-2
-  autofill:pt-6
-  autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           >
             <option value="male">Male</option>
             <option value="female">Female</option>
+            <option value="non-binary">Non-binary</option>
           </select>
           <label
-            className="absolute top-0 start-0 p-4 h-full truncate pointer-events-none transition ease-in-out duration-100 border border-transparent dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none
-    peer-focus:text-xs
-    peer-focus:-translate-y-1.5
-    peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-    peer-[:not(:placeholder-shown)]:text-xs
-    peer-[:not(:placeholder-shown)]:-translate-y-1.5
-    peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            htmlFor="gender"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
             Gender
           </label>
@@ -335,11 +301,11 @@ function Register() {
             value={formData.email}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600 focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm placeholder-transparent focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           />
           <label
             htmlFor="email"
-            className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent origin-[0_0] dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:scale-90 peer-focus:translate-x-0.5 peer-focus:-translate-y-1.5 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:translate-x-0.5 peer-[:not(:placeholder-shown)]:-translate-y-1.5 peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
             Email
           </label>
@@ -350,17 +316,17 @@ function Register() {
             type="text"
             id="cell"
             name="cell"
-            placeholder="Cell"
+            placeholder="Cell Number"
             value={formData.cell}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600 focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm placeholder-transparent focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           />
           <label
             htmlFor="cell"
-            className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent origin-[0_0] dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:scale-90 peer-focus:translate-x-0.5 peer-focus:-translate-y-1.5 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:translate-x-0.5 peer-[:not(:placeholder-shown)]:-translate-y-1.5 peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
-            Cell
+            Cell Number
           </label>
         </div>
 
@@ -373,60 +339,75 @@ function Register() {
             value={formData.address}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600 focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2"
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm placeholder-transparent focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           />
           <label
             htmlFor="address"
-            className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent origin-[0_0] dark:text-white peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:scale-90 peer-focus:translate-x-0.5 peer-focus:-translate-y-1.5 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:translate-x-0.5 peer-[:not(:placeholder-shown)]:-translate-y-1.5 peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
           >
             Address
           </label>
         </div>
 
-        <div className={styles.workHours}>
-          <h3>Work Hours</h3>
-          {Object.keys(formData.workHours).map((day) => (
-            <div key={day} className={styles.workHoursRow}>
-              <label>{day}</label>
-              <input
-                type="time"
-                name={`${day}.start`}
-                value={formData.workHours[day].start}
-                onChange={handleChange}
-                className={styles.inputWorkHours}
-              />
-              <span>to</span>
-              <input
-                type="time"
-                name={`${day}.end`}
-                value={formData.workHours[day].end}
-                onChange={handleChange}
-                className={styles.inputWorkHours}
-              />
+        {Object.keys(formData.workHours).map((day) => (
+          <div key={day} className="flex items-center space-x-4">
+            <div className="w-1/4">
+              <label
+                htmlFor={`${day}-start`}
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                {day}
+              </label>
             </div>
-          ))}
-          Employees will not be able to clock in unless they are within 1km of
-          the selected geofence location.
+            <input
+              type="time"
+              id={`${day}-start`}
+              name={`${day}.start`}
+              value={formData.workHours[day].start}
+              onChange={handleChange}
+              required
+              className="w-1/2 p-2 border border-gray-500 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg"
+            />
+            <span className="mx-2 text-gray-700 dark:text-gray-300">to</span>
+            <input
+              type="time"
+              id={`${day}-end`}
+              name={`${day}.end`}
+              value={formData.workHours[day].end}
+              onChange={handleChange}
+              required
+              className="w-1/2 p-2 border border-gray-500 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg"
+            />
+          </div>
+        ))}
+
+        <div className="relative">
           <select
+            id="geofence"
             name="geofence"
-            id="geofence-select"
             value={formData.geofence}
             onChange={handleChange}
-            required
+            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
           >
-            <option value="" selected disabled>
-              Select a geofence location
-            </option>
-            <option value={null}>None</option>
+            <option value="">Select Geofence</option>
             {options.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
               </option>
             ))}
           </select>
+          <label
+            htmlFor="geofence"
+            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
+          >
+            Geofence
+          </label>
         </div>
 
-        <button type="submit" className={styles.button}>
+        <button
+          type="submit"
+          className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white dark:text-gray-100 font-semibold rounded-lg shadow-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+        >
           Register
         </button>
       </form>
@@ -434,4 +415,4 @@ function Register() {
   );
 }
 
-export { Register };
+export default Register;

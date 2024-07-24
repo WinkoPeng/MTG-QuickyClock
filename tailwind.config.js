@@ -8,7 +8,11 @@ module.exports = {
     "./node_modules/preline/preline.js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: "#0185BE",
+      },
+    },
   },
   plugins: [require("preline/plugin")],
 };

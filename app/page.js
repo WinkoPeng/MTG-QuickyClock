@@ -55,7 +55,7 @@ export default function Home() {
       const userData = querySnapshot.docs[0].data();
       localStorage.setItem("userName", userData.name);
       localStorage.setItem("userId", mtgId); // Store user ID
-      updateWorkDuration(mtgId); // Continue updating work duration if user is online
+      //updateWorkDuration(mtgId); // Continue updating work duration if user is online
       router.push("/employee");
     } else {
       console.error("Invalid credentials");
@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <div
       className="relative w-full h-screen bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/images/eebg.jpg')" }} // Ensure correct path
+      style={{ backgroundImage: "url('/images/eebg.jpg')" }}
     >
       <div className="flex items-center justify-center lg:justify-end h-full px-4 lg:px-32">
         <div className="flex flex-col items-center w-full max-w-sm space-y-4 bg-white bg-opacity-80 p-6 rounded-lg shadow-lg">

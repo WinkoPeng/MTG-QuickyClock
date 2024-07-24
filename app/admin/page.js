@@ -1,12 +1,10 @@
-// page.js
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import withAuth from "../withAuth";
-import styles from "./admin.module.css";
-import { Register } from "./register";
+import dynamic from "next/dynamic";
+import Register from "./register";
 import EmployeeList from "./employeeList";
 import Dashboard from "./dashboard";
 import Edit from "./edit";
@@ -16,7 +14,7 @@ const GeofenceSetup = dynamic(() => import("./geofenceSetup"), {
 });
 import Contact from "./contact";
 import Bulletin from "./bulletin";
-import dynamic from "next/dynamic";
+import Sidebar from "./sidebar";
 
 import { collection, query, where, getDocs } from "firebase/firestore";
 import db from "../firebase";
@@ -27,6 +25,7 @@ function Admin() {
   const [userId, setUserId] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [pendingMessages, setPendingMessages] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -38,7 +37,6 @@ function Admin() {
     if (name) {
       setAdminName(name);
     }
-
     fetchMessages();
   }, []);
 
@@ -92,67 +90,28 @@ function Admin() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <title>MTG - Admin</title>
-      <div className={styles.sidebar}>
-        <div className={styles.welcome}>
-          <h3 className="text-2xl">Welcome,</h3>
-          <h2>{adminName}</h2>
-        </div>
-        <div className={styles.menu}>
-          <div
-            className={styles.sidebarItem}
-            onClick={() => setSelectedPage("Dashboard")}
-          >
-            Dashboard
-          </div>
-          <div
-            className={styles.sidebarItem}
-            onClick={() => setSelectedPage("Employee List")}
-          >
-            Employee List
-          </div>
-          <div
-            className={styles.sidebarItem}
-            onClick={() => setSelectedPage("Register")}
-          >
-            Register
-          </div>
-          <div
-            className={styles.sidebarItem}
-            onClick={() => setSelectedPage("Bulletin")}
-          >
-            Bulletin
-          </div>
-          <div
-            className={`${styles.sidebarItem} ${
-              pendingMessages ? styles.blinking : ""
-            }`}
-            onClick={() => {
-              setSelectedPage("Messages");
-              setPendingMessages(false);
-            }}
-          >
-            Employee Messages
-          </div>
-          <div
-            className={styles.sidebarItem}
-            onClick={() => setSelectedPage("GeofenceDisplay")}
-          >
-            Geofences
-          </div>
-          <div
-            className={styles.sidebarItem}
-            onClick={() => setSelectedPage("GeofenceSetup")}
-          >
-            Geofence Setup
-          </div>
-        </div>
-        <div className={styles.logout}>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
+
+      {/* Sidebar */}
+      <Sidebar
+        adminName={adminName}
+        selectedPage={selectedPage}
+        setSelectedPage={setSelectedPage}
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        handleLogout={handleLogout}
+        handlePendingMessages={setPendingMessages}
+      />
+
+      {/* Main Content */}
+      <div
+        className={`flex-grow transition-all duration-300 ease-in-out ${
+          isSidebarOpen ? "ml-64" : "ml-16"
+        } p-6 bg-gray-100 dark:bg-gray-900 flex flex-col max-w-full overflow-hidden`}
+      >
+        <div className="flex-1 overflow-y-auto max-w-full">{renderPage()}</div>
       </div>
-      <div className={styles.main}>{renderPage()}</div>
     </div>
   );
 }

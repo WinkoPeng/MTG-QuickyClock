@@ -3,9 +3,8 @@
 import React, { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import db from "../firebase";
-import styles from "./employee.module.css";
 
-const Contact = ({ userId, name }) => {
+const Contact = ({ userId, name, showContactModal, setShowContactModal }) => {
   const [formData, setFormData] = useState({
     userId: userId,
     name: name,
@@ -29,6 +28,7 @@ const Contact = ({ userId, name }) => {
         createdAt: new Date(),
       });
       setFormData({
+        ...formData,
         message: "",
       });
       setStatus("Form submitted successfully.");
@@ -39,68 +39,92 @@ const Contact = ({ userId, name }) => {
   };
 
   return (
-    <div className={styles.formGroup}>
-      <form onSubmit={handleSubmit}>
-        <h2>Contact Admins</h2>
-        <div className="max-w-sm">
-          <label
-            for="id"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            ID
-          </label>
-          <input
-            type="text"
-            id="id"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            value={formData.userId}
-            onChange={handleChange}
-            required
-            disabled
-          />
+    <>
+      {showContactModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+              onClick={() => setShowContactModal(false)}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <div className="p-4">
+              <form onSubmit={handleSubmit}>
+                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                  Contact Admins
+                </h2>
+                <div className="mb-4">
+                  <label
+                    htmlFor="id"
+                    className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-400"
+                  >
+                    ID
+                  </label>
+                  <input
+                    type="text"
+                    id="id"
+                    name="userId"
+                    className="py-2 px-3 block w-full border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500"
+                    value={formData.userId}
+                    onChange={handleChange}
+                    required
+                    disabled
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-400"
+                  >
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    className="py-2 px-3 block w-full border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    disabled
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-400"
+                  >
+                    Comment
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    className="py-2 px-3 block w-full border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500"
+                    rows="4"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  className="py-2 px-4 w-full bg-blue-600 dark:bg-blue-700 text-white dark:text-gray-200 rounded-lg font-medium hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:bg-blue-700 dark:focus:bg-blue-600"
+                >
+                  Submit
+                </button>
+                {status && (
+                  <p className="mt-4 text-sm text-center text-gray-800 dark:text-gray-200">
+                    {status}
+                  </p>
+                )}
+              </form>
+            </div>
+          </div>
         </div>
-        <div className="max-w-sm">
-          <label
-            for="name"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            disabled
-          />
-        </div>
-        <div className="max-w-sm">
-          <label
-            for="textarea-label"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            Comment
-          </label>
-          <textarea
-            id="textarea-label"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            rows="3"
-            value={formData.message}
-            onChange={handleChange}
-            required
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
-        >
-          Submit
-        </button>
-        {status && <p>{status}</p>}
-      </form>
-    </div>
+      )}
+    </>
   );
 };
 
