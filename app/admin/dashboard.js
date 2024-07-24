@@ -151,7 +151,7 @@ function Dashboard() {
     <div className="flex flex-col gap-4 p-4 bg-gray-800 dark:bg-gray-900">
       <div className="flex flex-wrap gap-5 mb-5">
         <div className="bg-blue-600 text-white p-5 rounded-lg shadow-lg flex-1 min-w-[250px] flex flex-col items-center justify-center text-center">
-          <h3 className="text-lg font-semibold">Today's Work Count</h3>
+          <h3 className="text-lg font-semibold">Today&apos;s Work Count</h3>
           <p className="text-xl">
             {workingTodayCount}/{totalEmployees}
           </p>
@@ -234,7 +234,7 @@ function Dashboard() {
                   Last Online
                 </th>
                 <th className="border-b px-4 py-2 text-left bg-gray-100 dark:bg-gray-700 text-sm md:text-base dark:text-gray-300">
-                  This Month's Work Hours
+                  This Month&apos;s Work Hours
                 </th>
               </tr>
             </thead>

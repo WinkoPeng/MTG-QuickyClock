@@ -240,11 +240,11 @@ function EmployeeList({ onEdit }) {
               </span>
             </p>
             <p className="text-sm mb-2 dark:text-gray-200">
-              Today's Work Hours:{" "}
+              Today&apos;s Work Hours:{" "}
               {formatWorkDuration(employee.workDurationToday)}
             </p>
             <p className="text-sm mb-4 dark:text-gray-200">
-              This Month's Work Hours:{" "}
+              This Month&apos;s Work Hours:{" "}
               {formatWorkDuration(employee.thisMonthWorkDuration || 0)}
             </p>
             <button

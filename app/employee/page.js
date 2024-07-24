@@ -165,6 +165,8 @@ const Employee = () => {
           <h1 className="text-2xl text-center font-bold mb-2 text-gray-900 dark:text-gray-100">
             {greeting}, {userName}
           </h1>
+
+          {/*Time section*/}
           <div className="flex flex-col md:flex-row md:space-x-4 mt-4">
             <div className="text-lg bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
               <p className="text-gray-900 dark:text-gray-100">
@@ -186,6 +188,7 @@ const Employee = () => {
               </p>
             </div>
 
+            {/*Announcements*/}
             <div className="w-full md:w-2/3 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
               <UserBulletinBoard />
             </div>
@@ -196,7 +199,7 @@ const Employee = () => {
                   className={`w-full py-2 px-4 rounded ${
                     isClockedIn
                       ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
-                      : "bg-blue-600 text-white"
+                      : "bg-green-600 text-white"
                   }`}
                   onClick={() =>
                     handleClockIn(
@@ -233,6 +236,78 @@ const Employee = () => {
                 >
                   Clock Out
                 </button>
+              </div>
+
+              {/*Break section*/}
+              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-4xl mx-auto">
+                <div className="flex flex-col md:flex-row gap-4 mb-4 flex-wrap">
+                  {/* Select Break Time */}
+                  <div className="flex items-center gap-2 flex-1 min-w-[150px]">
+                    <input
+                      type="radio"
+                      name="breakOption"
+                      value="select"
+                      checked={selectedOption === "select"}
+                      onChange={handleOptionChange}
+                      disabled={!isClockedIn}
+                      className="form-radio text-blue-500 dark:text-blue-400"
+                    />
+                    <select
+                      className={`p-2 border rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${
+                        selectedOption !== "select" || !isClockedIn
+                          ? "bg-gray-200 dark:bg-gray-800"
+                          : ""
+                      }`}
+                      value={breakTime}
+                      onChange={handleBreakTimeChange}
+                      disabled={selectedOption !== "select" || !isClockedIn}
+                    >
+                      <option value="15">15 min</option>
+                      <option value="30">30 min</option>
+                      <option value="45">45 min</option>
+                      <option value="60">60 min</option>
+                    </select>
+                  </div>
+
+                  {/* Custom Break Time */}
+                  <div className="flex items-center gap-2 flex-1 min-w-[150px]">
+                    <input
+                      type="radio"
+                      name="breakOption"
+                      value="custom"
+                      checked={selectedOption === "custom"}
+                      onChange={handleOptionChange}
+                      disabled={!isClockedIn}
+                      className="form-radio text-blue-500 dark:text-blue-400"
+                    />
+                    <input
+                      type="number"
+                      className={`p-2 border rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${
+                        selectedOption !== "custom" || !isClockedIn
+                          ? "bg-gray-200 dark:bg-gray-800"
+                          : ""
+                      }`}
+                      placeholder="Custom"
+                      value={customBreakTime}
+                      onChange={handleCustomBreakTimeChange}
+                      disabled={selectedOption !== "custom" || !isClockedIn}
+                      min="1"
+                    />
+                  </div>
+
+                  {/* Start Break Button */}
+                  <button
+                    className={`flex-shrink-0 px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      !isClockedIn || isOnBreak
+                        ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                        : ""
+                    }`}
+                    onClick={handleStartBreakClick}
+                    disabled={!isClockedIn || isOnBreak}
+                  >
+                    Start Break
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-2">
