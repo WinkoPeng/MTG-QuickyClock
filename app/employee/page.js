@@ -171,13 +171,26 @@ const Employee = () => {
         <title>MTG - Employee</title>
         <div className="bg-white min-w-full dark:bg-gray-900 p-4 shadow-lg">
           {/* Greeting and Time Section */}
-          <div className="flex flex-col mb-4">
-            {/* Greeting Section */}
-            <div className="text-center px-2 mb-4">
-              <h1 className="text-xl font-bold mb-1 text-gray-900 dark:text-gray-100">
-                Good {greeting}, {userName}
-              </h1>
+          <div className="bg-white min-w-full dark:bg-gray-900 p-4 shadow-lg">
+            {/* Header Section */}
+            <div className="flex items-center justify-between mb-4">
+              {/* Logout Button */}
+              <a
+                href="#"
+                className="text-red-600 dark:text-red-400 hover:underline text-xs sm:text-sm md:text-base"
+                onClick={handleLogout}
+              >
+                Log Out
+              </a>
+
+              {/* Greeting Section */}
+              <div className="text-center flex-grow">
+                <h1 className="text-xl font-bold mb-1 text-gray-900 dark:text-gray-100">
+                  Good {greeting}, {userName}
+                </h1>
+              </div>
             </div>
+
             {/* Time Section */}
             <div className="text-sm md:text-base lg:text-lg xl:text-xl bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md text-center md:text-left lg:text-center">
               <p className="text-gray-900 dark:text-gray-100">
@@ -372,13 +385,6 @@ const Employee = () => {
               </table>
             </div>
           )}
-
-          <button
-            className="mt-4 w-full py-2 px-4 bg-red-600 dark:bg-red-700 text-white rounded"
-            onClick={handleLogout}
-          >
-            Log Out
-          </button>
         </div>
 
         {isLoading && (

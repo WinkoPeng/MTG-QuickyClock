@@ -13,7 +13,6 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import db from "../firebase";
-import styles from "./admin.module.css";
 
 function Edit({ employee, onCancel }) {
   const router = useRouter();

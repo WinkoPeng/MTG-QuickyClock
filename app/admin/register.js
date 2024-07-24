@@ -228,65 +228,72 @@ function Register() {
           </label>
         </div>
 
-        <div className="relative">
+        <div className="relative flex flex-col space-y-2">
           <select
-            id="class"
             name="class"
             value={formData.class}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+            className="peer p-4 block w-full rounded-lg text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 dark:text-neutral-400 dark:focus:ring-neutral-600 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+      focus:pt-6 focus:pb-2
+      [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2"
           >
             <option value="employee">Employee</option>
             <option value="admin">Admin</option>
           </select>
           <label
             htmlFor="class"
-            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
+            className="absolute top-1 left-4 text-gray-500 dark:text-neutral-500 transition-transform duration-300 ease-in-out transform -translate-y-2 scale-75 origin-top-left peer-placeholder-shown:translate-y-4 peer-placeholder-shown:scale-100 peer-focus:-translate-y-2 peer-focus:scale-75 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500"
           >
-            Employee Type
+            Class
           </label>
         </div>
 
-        <div className="relative">
+        <div className="relative flex flex-col space-y-2">
           <select
-            id="title"
             name="title"
             value={formData.title}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+            className="peer p-4 block w-full rounded-lg text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 dark:text-neutral-400 dark:focus:ring-neutral-600 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+      focus:pt-6 focus:pb-2
+      [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2"
           >
+            <option value="" disabled>
+              Select a title
+            </option>
             <option value="Administrative Officer">
               Administrative Officer
             </option>
-            <option value="Manager">Manager</option>
-            <option value="Clerk">Clerk</option>
+            <option value="Program Coordinator">Program Coordinator</option>
+            <option value="Instructor">Instructor</option>
+            <option value="Receptionist">Receptionist</option>
           </select>
           <label
             htmlFor="title"
-            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
+            className="absolute top-1 left-4 text-gray-500 dark:text-neutral-500 transition-transform duration-300 ease-in-out transform -translate-y-2 scale-75 origin-top-left peer-placeholder-shown:translate-y-4 peer-placeholder-shown:scale-100 peer-focus:-translate-y-2 peer-focus:scale-75 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500"
           >
             Title
           </label>
         </div>
 
-        <div className="relative">
+        <div className="relative flex flex-col space-y-2">
           <select
-            id="gender"
             name="gender"
             value={formData.gender}
             onChange={handleChange}
             required
-            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+            className="peer p-4 block w-full rounded-lg text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 dark:text-neutral-400 dark:focus:ring-neutral-600 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+      focus:pt-6 focus:pb-2
+      [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2"
           >
             <option value="male">Male</option>
             <option value="female">Female</option>
-            <option value="non-binary">Non-binary</option>
+            <option value="other">Other</option>
           </select>
           <label
             htmlFor="gender"
-            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
+            className="absolute top-1 left-4 text-gray-500 dark:text-neutral-500 transition-transform duration-300 ease-in-out transform -translate-y-2 scale-75 origin-top-left peer-placeholder-shown:translate-y-4 peer-placeholder-shown:scale-100 peer-focus:-translate-y-2 peer-focus:scale-75 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500"
           >
             Gender
           </label>
@@ -387,9 +394,11 @@ function Register() {
             name="geofence"
             value={formData.geofence}
             onChange={handleChange}
-            className="peer p-4 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+            className="peer p-4 block w-full rounded-lg text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 dark:text-neutral-400 dark:focus:ring-neutral-600 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+      focus:pt-6 focus:pb-2
+      [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2"
           >
-            <option value="">Select Geofence</option>
+            <option value="None">None</option>
             {options.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -398,7 +407,7 @@ function Register() {
           </select>
           <label
             htmlFor="geofence"
-            className="absolute top-0 left-0 p-4 h-full text-sm truncate pointer-events-none transition-all duration-300 transform origin-top-left peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-500 dark:peer-focus:text-blue-400"
+            className="absolute top-3 left-4 text-gray-500 dark:text-neutral-500 transition-transform duration-300 ease-in-out transform -translate-y-2 scale-75 origin-top-left peer-placeholder-shown:translate-y-4 peer-placeholder-shown:scale-100 peer-focus:-translate-y-2 peer-focus:scale-75 peer-focus:text-gray-500 dark:peer-focus:text-neutral-500"
           >
             Geofence
           </label>

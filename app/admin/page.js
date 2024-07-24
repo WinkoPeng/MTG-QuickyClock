@@ -8,10 +8,7 @@ import Register from "./register";
 import EmployeeList from "./employeeList";
 import Dashboard from "./dashboard";
 import Edit from "./edit";
-import GeofenceDisplay from "./geofenceDisplay";
-const GeofenceSetup = dynamic(() => import("./geofenceSetup"), {
-  ssr: false,
-});
+import GeofenceManager from "./geofenceManager"; // Import the new combined component
 import Contact from "./contact";
 import Bulletin from "./bulletin";
 import Sidebar from "./sidebar";
@@ -80,10 +77,8 @@ function Admin() {
         return <Bulletin userId={userId} userName={adminName} />;
       case "Messages":
         return <Contact userName={adminName} updateMessages={fetchMessages} />;
-      case "GeofenceDisplay":
-        return <GeofenceDisplay />;
-      case "GeofenceSetup":
-        return <GeofenceSetup />;
+      case "Geofence Manager":
+        return <GeofenceManager />;
       default:
         return <Dashboard />;
     }
@@ -107,7 +102,7 @@ function Admin() {
       {/* Main Content */}
       <div
         className={`flex-grow transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? "ml-64" : "ml-16"
+          isSidebarOpen ? "ml-48" : "ml-0"
         } p-6 bg-gray-100 dark:bg-gray-900 flex flex-col max-w-full overflow-hidden`}
       >
         <div className="flex-1 overflow-y-auto max-w-full">{renderPage()}</div>

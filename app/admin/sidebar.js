@@ -9,8 +9,9 @@ const Sidebar = ({
   setSelectedPage,
   handleLogout,
   handlePendingMessages,
+  isSidebarOpen,
+  setIsSidebarOpen,
 }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef(null);
 
   // Toggle sidebar visibility
@@ -45,29 +46,29 @@ const Sidebar = ({
     <div className="relative">
       {/* Burger Menu Icon */}
       <button
-        className="md:hidden p-4 absolute top-4 left-4 text-white"
+        className="md:hidden p-2 absolute top-4 left-4 text-white"
         onClick={toggleSidebar}
         aria-label="Toggle sidebar"
       >
         {isSidebarOpen ? (
-          <XMarkIcon className="w-6 h-6" />
+          <XMarkIcon className="w-5 h-5" />
         ) : (
-          <Bars3Icon className="w-6 h-6" />
+          <Bars3Icon className="w-5 h-5" />
         )}
       </button>
 
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed inset-y-0 left-0 w-64 bg-primaryDark text-white p-6 flex flex-col justify-between md:relative md:w-64 md:flex md:flex-col md:justify-between transition-transform duration-300 transform ${
+        className={`fixed inset-y-0 left-0 w-48 bg-primaryDark text-white h-full p-4 flex flex-col justify-between md:relative md:w-48 md:flex md:flex-col md:justify-between transition-transform duration-300 transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 overflow-y-auto md:overflow-y-auto`}
         aria-label="Sidebar"
       >
         <div className="flex flex-col flex-grow">
           <div className="text-center mb-6">
-            <h3 className="text-xl font-semibold">Welcome,</h3>
-            <h2 className="text-2xl font-bold">{adminName}</h2>
+            <h3 className="text-lg font-semibold">Welcome,</h3>
+            <h2 className="text-xl font-bold">{adminName}</h2>
           </div>
           <div className="flex flex-col flex-grow space-y-2">
             {[
@@ -76,8 +77,7 @@ const Sidebar = ({
               "Register",
               "Bulletin",
               "Messages",
-              "GeofenceDisplay",
-              "GeofenceSetup",
+              "Geofence Manager",
             ].map((page) => (
               <button
                 key={page}
