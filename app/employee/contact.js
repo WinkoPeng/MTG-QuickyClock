@@ -1,16 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import db from "../firebase";
 
 const Contact = ({ userId, name, showContactModal, setShowContactModal }) => {
-  const [formData, setFormData] = useState({
-    userId: userId,
-    name: name,
-    message: "",
-  });
+  const [formData, setFormData] = useState();
   const [status, setStatus] = useState(null);
+
+  useEffect(() => {
+    setFormData({
+      userId: userId,
+      name: name,
+      message: "",
+    });
+  }, [userId, name]);
 
   const handleChange = (e) => {
     setFormData({
