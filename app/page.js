@@ -1,45 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import {
-  collection,
-  getDocs,
-  updateDoc,
-  doc,
-  query,
-  where,
-} from "firebase/firestore";
-import db from "./firebase";
-import { DateTime } from "luxon";
 import mtglogo from "../public/images/MTGBCSLogo.jpg";
-import { updateWorkDuration } from "./employee/timer";
 import { verifyUser } from "./employee/auth";
 
 export default function Home() {
   const router = useRouter();
 
-  const updateAllEmployeesWorkDuration = async () => {
-    const now = DateTime.now().setZone("America/Edmonton");
-    const today = now.toISODate();
-
-    const employeesSnapshot = await getDocs(collection(db, "employee"));
-
-    employeesSnapshot.forEach(async (employeeDoc) => {
-      const userData = employeeDoc.data();
-      const lastOnlineDate = userData.lastOnlineDate || today;
-
-      if (today !== lastOnlineDate) {
-        const userRef = doc(db, "employee", employeeDoc.id);
-        await updateDoc(userRef, { workDurationToday: 0 });
-      }
-    });
-  };
-
-  useEffect(() => {
-    updateAllEmployeesWorkDuration();
-  }, []);
+  const [error, setError] = useState(null);
 
   const handleLogin = async () => {
     try {
@@ -52,11 +22,9 @@ export default function Home() {
         const userData = verifiedUser;
         localStorage.setItem("userName", userData.name);
         localStorage.setItem("userId", mtgId); // Store user ID
-        //updateWorkDuration(mtgId); // Continue updating work duration if user is online
         router.push("/employee");
       } else {
-        console.error("Invalid credentials");
-        alert("Invalid credentials");
+        setError("Username or password is incorrect");
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -74,15 +42,12 @@ export default function Home() {
       if (userData.class === "admin") {
         localStorage.setItem("adminName", userData.name); // Store admin name
         localStorage.setItem("userId", mtgId); // Store user ID
-        updateWorkDuration(mtgId); // Continue updating work duration if user is online
         router.push("/admin");
       } else {
-        console.error("You are not authorized to access admin page");
-        alert("You are not authorized to access admin page");
+        setError("Invalid admin credentials");
       }
     } else {
-      console.error("Invalid credentials");
-      alert("Invalid credentials");
+      setError("Username or password is incorrect");
     }
   };
 
@@ -94,6 +59,7 @@ export default function Home() {
       <div className="flex items-center justify-center lg:justify-end h-full px-4 lg:px-32">
         <div className="flex flex-col items-center w-full max-w-sm space-y-4 bg-white bg-opacity-80 p-6 rounded-lg shadow-lg">
           <Image src={mtglogo} alt="MTG Logo" className="w-64 h-auto" />
+          {error && <p className="text-red-500 text-sm">{error}</p>}
           <input
             type="text"
             placeholder="Enter Your MTG ID"

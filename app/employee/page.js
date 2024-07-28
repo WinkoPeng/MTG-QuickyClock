@@ -170,19 +170,18 @@ const Employee = () => {
       <div className="container mx-auto dark:bg-gray-900">
         <title>MTG - Employee</title>
         <div className="bg-white min-w-full dark:bg-gray-900 p-4 shadow-lg">
+          {/* Logout Button */}
+          <a
+            href="#"
+            className="text-red-600 dark:text-red-400 hover:underline text-xs sm:text-sm md:text-base"
+            onClick={handleLogout}
+          >
+            Log Out
+          </a>
           {/* Greeting and Time Section */}
           <div className="bg-white min-w-full dark:bg-gray-900 p-4 shadow-lg">
             {/* Header Section */}
             <div className="flex items-center justify-between mb-4">
-              {/* Logout Button */}
-              <a
-                href="#"
-                className="text-red-600 dark:text-red-400 hover:underline text-xs sm:text-sm md:text-base"
-                onClick={handleLogout}
-              >
-                Log Out
-              </a>
-
               {/* Greeting Section */}
               <div className="text-center flex-grow">
                 <h1 className="text-xl font-bold mb-1 text-gray-900 dark:text-gray-100">
@@ -220,7 +219,7 @@ const Employee = () => {
               <div className="space-y-2">
                 {!isClockedIn ? (
                   <button
-                    className={`w-full h-full py-10 text-4xl px-4 rounded-full ${
+                    className={`w-full h-full py-5 text-4xl px-4 rounded-full ${
                       isClockedIn
                         ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
                         : "bg-green-600 text-white"
@@ -240,7 +239,7 @@ const Employee = () => {
                   </button>
                 ) : (
                   <button
-                    className={`w-full h-full py-10 text-4xl px-4 rounded-full ${
+                    className={`w-full h-full py-5 text-4xl px-4 rounded-full ${
                       !isClockedIn
                         ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
                         : "bg-red-600 text-white"
@@ -339,23 +338,22 @@ const Employee = () => {
             </div>
           </div>
 
-          {/* Additional Buttons */}
           <div className="flex flex-col space-y-2 mt-4">
             <div className="flex flex-row gap-4">
               <button
-                className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                className="w-full py-2 px-4 sm:py-1 sm:px-2 text-base sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
                 onClick={() => setShowContactModal(true)}
               >
                 Contact Admins
               </button>
               <button
-                className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                className="w-full py-2 px-4 sm:py-1 sm:px-2 text-base sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
                 onClick={() => setSentFormsModal(true)}
               >
                 View Sent Contact Forms
               </button>
               <button
-                className="w-full py-2 px-4 bg-blue-600 dark:bg-blue-700 text-white rounded"
+                className="w-full py-2 px-4 sm:py-1 sm:px-2 text-base sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
                 onClick={() => setShowPasswordModal(true)}
               >
                 Change Password
@@ -414,17 +412,20 @@ const Employee = () => {
           </div>
         )}
 
+        {/* Modals */}
         <ChangePasswordModal
           userId={userId}
           showPasswordModal={showPasswordModal}
           setShowPasswordModal={setShowPasswordModal}
         />
-        <Contact
-          userId={userId}
-          name={userName}
-          showContactModal={showContactModal}
-          setShowContactModal={setShowContactModal}
-        />
+        {showContactModal && (
+          <Contact
+            userId={userId}
+            name={userName}
+            showContactModal={showContactModal}
+            setShowContactModal={setShowContactModal}
+          />
+        )}
         <SentForms
           userId={userId}
           showSentFormsModal={showSentFormsModal}

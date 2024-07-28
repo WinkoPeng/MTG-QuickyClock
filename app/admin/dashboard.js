@@ -157,7 +157,9 @@ function Dashboard() {
           </p>
         </div>
         <div className="bg-yellow-400 text-black p-5 rounded-lg shadow-lg flex-1 min-w-[250px] flex flex-col items-center justify-center text-center">
-          <h3 className="text-lg font-semibold">Employees Working Today</h3>
+          <h3 className="text-lg font-semibold">
+            Employees Scheduled for Today
+          </h3>
           <ul className="flex flex-col items-center w-full mt-4">
             {workingTodayEmployees.map((emp, index) => (
               <li
@@ -170,7 +172,9 @@ function Dashboard() {
           </ul>
         </div>
         <div className="bg-green-600 text-white p-5 rounded-lg shadow-lg flex-1 min-w-[250px] flex flex-col items-center justify-center text-center">
-          <h3 className="text-lg font-semibold">Real-time Online Count</h3>
+          <h3 className="text-lg font-semibold">
+            Employees Currently Clocked In
+          </h3>
           <p className="text-xl">{onlineCount}</p>
         </div>
         <div className="bg-pink-600 text-white p-5 rounded-lg shadow-lg flex-1 min-w-[250px] flex flex-col items-center justify-center text-center">

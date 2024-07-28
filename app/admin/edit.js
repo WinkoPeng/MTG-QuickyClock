@@ -406,25 +406,6 @@ function Edit({ employee, onCancel }) {
 
         <div className="flex flex-col space-y-2">
           <label
-            htmlFor="gender"
-            className="font-medium text-gray-900 dark:text-gray-100"
-          >
-            Gender
-          </label>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label
             htmlFor="email"
             className="font-medium text-gray-900 dark:text-gray-100"
           >

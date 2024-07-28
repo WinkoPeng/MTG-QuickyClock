@@ -51,41 +51,68 @@ const Contact = ({ userName, updateMessages }) => {
       <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
         Employee Messages
       </h2>
-      <ul className="space-y-4">
+      <ul className="space-y-6">
         {contactForms.map((form) => (
           <li
             key={form.id}
-            className="p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm"
+            className="p-6 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-md"
           >
-            <p className="text-gray-800 dark:text-gray-200">
-              <strong>Employee ID:</strong> {form.userId}
-            </p>
-            <p className="text-gray-800 dark:text-gray-200">
-              <strong>Name:</strong> {form.name}
-            </p>
-            <p className="text-gray-800 dark:text-gray-200">
-              <strong>Time:</strong> {form.createdAt.toDate().toLocaleString()}
-            </p>
-            <p className="text-gray-800 dark:text-gray-200">
-              <strong>Message:</strong> {form.message}
-            </p>
-            <p className="text-gray-800 dark:text-gray-200">
-              <strong>Status:</strong> {form.status}
-            </p>
-            {form.status === "pending" && (
-              <button
-                onClick={() => {
-                  handleUpdateStatus(
-                    form.id,
-                    `Resolved by ${adminName} at ${new Date().toLocaleString()}`
-                  );
-                  updateMessages();
-                }}
-                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
-              >
-                Mark as Resolved
-              </button>
-            )}
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
+                <p className="text-gray-800 dark:text-gray-200 font-medium">
+                  Employee ID:
+                </p>
+                <p className="text-gray-800 dark:text-gray-200">
+                  {form.userId}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
+                <p className="text-gray-800 dark:text-gray-200 font-medium">
+                  Name:
+                </p>
+                <p className="text-gray-800 dark:text-gray-200">{form.name}</p>
+              </div>
+              <div className="p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
+                <p className="text-gray-800 dark:text-gray-200 font-medium">
+                  Time:
+                </p>
+                <p className="text-gray-800 dark:text-gray-200">
+                  {form.createdAt.toDate().toLocaleString()}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
+                <p className="text-gray-800 dark:text-gray-200 font-medium">
+                  Message:
+                </p>
+                <p className="text-gray-800 dark:text-gray-200">
+                  {form.message}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
+                <p className="text-gray-800 dark:text-gray-200 font-medium">
+                  Status:
+                </p>
+                <p className="text-gray-800 dark:text-gray-200">
+                  {form.status}
+                </p>
+              </div>
+              {form.status === "pending" && (
+                <div className="mt-4">
+                  <button
+                    onClick={() => {
+                      handleUpdateStatus(
+                        form.id,
+                        `Resolved by ${adminName} at ${new Date().toLocaleString()}`
+                      );
+                      updateMessages();
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
+                  >
+                    Mark as Resolved
+                  </button>
+                </div>
+              )}
+            </div>
           </li>
         ))}
       </ul>

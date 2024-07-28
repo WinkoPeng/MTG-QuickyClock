@@ -5,10 +5,16 @@ import { collection, addDoc } from "firebase/firestore";
 import db from "../firebase";
 
 const Contact = ({ userId, name, showContactModal, setShowContactModal }) => {
-  const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState({
+    userId: "",
+    name: "",
+    message: "",
+  });
   const [status, setStatus] = useState(null);
 
   useEffect(() => {
+    console.log("Props received:", { userId, name });
+
     setFormData({
       userId: userId,
       name: name,

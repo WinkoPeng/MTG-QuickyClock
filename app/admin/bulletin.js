@@ -86,7 +86,7 @@ const Bulletin = ({ userId, userName }) => {
     <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-6">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Add New Bulletin
+          Make an Announcement
         </h2>
         <input
           type="text"
@@ -115,13 +115,13 @@ const Bulletin = ({ userId, userName }) => {
               : "bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700"
           } transition-colors`}
         >
-          Add Bulletin
+          Add Announcement
         </button>
       </div>
 
       <div>
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Bulletin List
+          Announcements
         </h2>
         <ul className="space-y-4">
           {bulletins.map((bulletin) => (

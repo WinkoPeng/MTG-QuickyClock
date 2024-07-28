@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import withAuth from "../withAuth";
-import dynamic from "next/dynamic";
 import Register from "./register";
 import EmployeeList from "./employeeList";
 import Dashboard from "./dashboard";
@@ -11,6 +10,7 @@ import Edit from "./edit";
 import GeofenceManager from "./geofenceManager";
 import Contact from "./contact";
 import Bulletin from "./bulletin";
+import Timesheet from "./timesheet";
 import Sidebar from "./sidebar";
 
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -55,27 +55,32 @@ const Admin = () => {
     switch (selectedPage) {
       case "Dashboard":
         return <Dashboard />;
-      case "Employee List":
+      case "Manage Employees":
         return (
           <EmployeeList
             onEdit={(employee) => {
               setSelectedEmployee(employee);
               setSelectedPage("Edit");
             }}
+            onAdd={() => setSelectedPage("Register")}
           />
         );
       case "Register":
-        return <Register />;
+        return (
+          <Register onCancel={() => setSelectedPage("Manage Employees")} />
+        );
       case "Edit":
         return (
           <Edit
             employee={selectedEmployee}
-            onCancel={() => setSelectedPage("Employee List")}
+            onCancel={() => setSelectedPage("Manage Employees")}
           />
         );
-      case "Bulletin":
+      case "Timesheets":
+        return <Timesheet />;
+      case "Announcements":
         return <Bulletin userId={userId} userName={adminName} />;
-      case "Messages":
+      case "Employee Messages":
         return <Contact userName={adminName} updateMessages={fetchMessages} />;
       case "Geofence Manager":
         return <GeofenceManager />;
@@ -85,7 +90,7 @@ const Admin = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
       <title>MTG - Admin</title>
 
       {/* Sidebar */}
@@ -96,17 +101,24 @@ const Admin = () => {
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         handleLogout={handleLogout}
-        handlePendingMessages={setPendingMessages}
       />
 
       {/* Main Content */}
       <div
-        className={`flex-grow transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? "ml-48" : "ml-0"
-        } p-6 bg-gray-100 dark:bg-gray-900 flex flex-col max-w-full overflow-hidden`}
+        className={`flex-grow transition-all duration-300 ease-in-out p-6 bg-gray-100 dark:bg-gray-900 flex flex-col max-w-full overflow-hidden ${
+          isSidebarOpen ? "md:ml-48" : ""
+        }`}
       >
         <div className="flex-1 overflow-y-auto max-w-full">{renderPage()}</div>
       </div>
+
+      {/* Overlay for smaller screens */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black opacity-50 z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 };

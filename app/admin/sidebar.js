@@ -1,7 +1,25 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"; // Import icons
+import {
+  Bars3Icon,
+  XMarkIcon,
+  HomeIcon,
+  ClockIcon,
+  MegaphoneIcon,
+  UsersIcon,
+  EnvelopeIcon,
+  MapIcon,
+} from "@heroicons/react/24/outline"; // Import icons
+
+const pageIcons = {
+  Dashboard: HomeIcon,
+  Timesheets: ClockIcon,
+  Announcements: MegaphoneIcon,
+  "Manage Employees": UsersIcon,
+  "Employee Messages": EnvelopeIcon,
+  "Geofence Manager": MapIcon,
+}; // Map page names to icons
 
 const Sidebar = ({
   adminName,
@@ -40,29 +58,30 @@ const Sidebar = ({
   const handlePageChange = (page) => {
     setSelectedPage(page);
     if (page === "Messages") handlePendingMessages(false);
+    setIsSidebarOpen(false); // Close sidebar when a page is selected
   };
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       {/* Burger Menu Icon */}
       <button
-        className="md:hidden p-2 absolute top-4 left-4 text-white"
-        onClick={toggleSidebar}
+        className="md:hidden p-2 fixed top-4 left-4 z-50 text-white"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         aria-label="Toggle sidebar"
       >
         {isSidebarOpen ? (
-          <XMarkIcon className="w-5 h-5" />
+          <XMarkIcon className="w-6 h-6" />
         ) : (
-          <Bars3Icon className="w-5 h-5" />
+          <Bars3Icon className="w-6 h-6" />
         )}
       </button>
 
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed inset-y-0 left-0 w-48 bg-primaryDark text-white h-full p-4 flex flex-col justify-between md:relative md:w-48 md:flex md:flex-col md:justify-between transition-transform duration-300 transform ${
+        className={`fixed inset-y-0 left-0 w-48 bg-primaryDark text-white h-full p-4 flex flex-col justify-between transition-transform duration-300 transform z-50 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 overflow-y-auto md:overflow-y-auto`}
+        } md:relative md:translate-x-0 overflow-y-auto`}
         aria-label="Sidebar"
       >
         <div className="flex flex-col flex-grow">
@@ -71,30 +90,24 @@ const Sidebar = ({
             <h2 className="text-xl font-bold">{adminName}</h2>
           </div>
           <div className="flex flex-col flex-grow space-y-2">
-            {[
-              "Dashboard",
-              "Employee List",
-              "Register",
-              "Bulletin",
-              "Messages",
-              "Geofence Manager",
-            ].map((page) => (
-              <button
-                key={page}
-                className={`text-left py-2 px-4 rounded transition-colors focus:outline-none ${
-                  selectedPage === page
-                    ? "bg-accent text-white"
-                    : "bg-primaryDark text-gray-200 hover:bg-accent focus:bg-accent"
-                }`}
-                onClick={() => {
-                  handlePageChange(page);
-                  setIsSidebarOpen(false); // Close sidebar when a page is selected
-                }}
-                aria-label={`Go to ${page}`}
-              >
-                {page}
-              </button>
-            ))}
+            {Object.keys(pageIcons).map((page) => {
+              const Icon = pageIcons[page];
+              return (
+                <button
+                  key={page}
+                  className={`text-left py-2 px-4 rounded transition-colors focus:outline-none flex items-center space-x-2 ${
+                    selectedPage === page
+                      ? "bg-accent text-white"
+                      : "bg-primaryDark text-gray-200 hover:bg-accent focus:bg-accent"
+                  }`}
+                  onClick={() => handlePageChange(page)}
+                  aria-label={`Go to ${page}`}
+                >
+                  <Icon className="h-6 w-6 flex-shrink-0" aria-hidden="true" />
+                  <span>{page}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
         <div className="text-center mt-4">
