@@ -5,35 +5,44 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  Timestamp,
 } from "firebase/firestore";
 import db from "../firebase";
 
 const Bulletin = ({ userId, userName }) => {
+  // State to manage bulletins, new bulletin form data, and admin information
   const [bulletins, setBulletins] = useState([]);
   const [newBulletin, setNewBulletin] = useState({ title: "", message: "" });
   const [adminId, setAdminId] = useState(userId);
   const [adminName, setAdminName] = useState(userName);
 
+  // Fetch bulletins from Firestore when the component mounts
   useEffect(() => {
     const fetchBulletins = async () => {
       try {
+        // Get all documents from the "bulletins" collection
         const querySnapshot = await getDocs(collection(db, "bulletins"));
+
+        // Map each document to its data and include the document ID
         const bulletinsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        // Sort bulletins by the 'createdAt' field in descending order
+        // Sort bulletins by 'createdAt' field in descending order
         const sortedBulletins = bulletinsData.sort((a, b) => {
-          const dateA = a.createdAt.toDate
-            ? a.createdAt.toDate()
-            : new Date(a.createdAt);
-          const dateB = b.createdAt.toDate
-            ? b.createdAt.toDate()
-            : new Date(b.createdAt);
+          const dateA =
+            a.createdAt instanceof Timestamp
+              ? a.createdAt.toDate()
+              : new Date(a.createdAt.seconds * 1000); // Convert Firestore timestamp to JavaScript Date
+          const dateB =
+            b.createdAt instanceof Timestamp
+              ? b.createdAt.toDate()
+              : new Date(b.createdAt.seconds * 1000); // Convert Firestore timestamp to JavaScript Date
           return dateB - dateA;
         });
 
+        // Update state with sorted bulletins
         setBulletins(sortedBulletins);
       } catch (error) {
         console.error("Error fetching bulletins:", error);
@@ -41,42 +50,49 @@ const Bulletin = ({ userId, userName }) => {
     };
 
     fetchBulletins();
-  }, []);
+  }, []); // Empty dependency array means this runs once when component mounts
 
+  // Handle adding a new bulletin
   const handleAddBulletin = async () => {
     try {
+      // Check if title and message are not empty
       if (newBulletin.title && newBulletin.message) {
-        await addDoc(collection(db, "bulletins"), {
+        // Add a new document to the "bulletins" collection
+        const docRef = await addDoc(collection(db, "bulletins"), {
           title: newBulletin.title,
           author: adminName,
           authorId: adminId,
           message: newBulletin.message,
-          createdAt: new Date(),
+          createdAt: Timestamp.now(), // Use Firestore Timestamp for creation time
         });
-        setNewBulletin({ title: "", message: "" }); // Clear form
-        // Fetch updated list of bulletins
-        const querySnapshot = await getDocs(collection(db, "bulletins"));
-        const bulletinsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setBulletins(bulletinsData);
+
+        // Create a new bulletin object with the ID and other details
+        const newBulletinData = {
+          id: docRef.id,
+          title: newBulletin.title,
+          author: adminName,
+          authorId: adminId,
+          message: newBulletin.message,
+          createdAt: Timestamp.now(), // Use Firestore Timestamp for creation time
+        };
+
+        // Update state to include the new bulletin at the top
+        setBulletins([newBulletinData, ...bulletins]);
+        setNewBulletin({ title: "", message: "" }); // Clear form fields
       }
     } catch (error) {
       console.error("Error adding bulletin:", error);
     }
   };
 
+  // Handle deleting a bulletin
   const handleDeleteBulletin = async (id) => {
     try {
+      // Delete the document from the "bulletins" collection
       await deleteDoc(doc(db, "bulletins", id));
-      // Fetch updated list of bulletins
-      const querySnapshot = await getDocs(collection(db, "bulletins"));
-      const bulletinsData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setBulletins(bulletinsData);
+
+      // Remove the deleted bulletin from the state
+      setBulletins(bulletins.filter((bulletin) => bulletin.id !== id));
     } catch (error) {
       console.error("Error deleting bulletin:", error);
     }
@@ -107,7 +123,7 @@ const Bulletin = ({ userId, userName }) => {
           rows="4"
         />
         <button
-          onClick={() => handleAddBulletin(newBulletin)}
+          onClick={handleAddBulletin}
           disabled={!newBulletin.title || !newBulletin.message}
           className={`mt-4 py-2 px-4 w-full rounded-lg font-medium text-white ${
             !newBulletin.title || !newBulletin.message
@@ -141,7 +157,8 @@ const Bulletin = ({ userId, userName }) => {
                 {bulletin.message}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-500">
-                {new Date(bulletin.createdAt.toDate()).toLocaleString()}
+                {new Date(bulletin.createdAt.seconds * 1000).toLocaleString()}{" "}
+                {/* Ensure valid date conversion */}
               </p>
               {userId === bulletin.authorId && (
                 <button

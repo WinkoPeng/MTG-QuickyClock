@@ -27,7 +27,6 @@ const WorkHours = ({ employeeId }) => {
 
         if (!querySnapshot.empty) {
           const docData = querySnapshot.docs[0].data();
-          console.log(docData);
           setWorkHours(docData.workHours);
         }
       } catch (err) {

@@ -140,7 +140,8 @@ function Register({ onCancel }) {
       setFormData({
         id: "",
         password: "",
-        name: "",
+        firstName: "",
+        lastName: "",
         class: "employee",
         title: "Administrative Officer",
         gender: "male",
@@ -220,17 +221,36 @@ function Register({ onCancel }) {
 
         <div>
           <label
-            htmlFor="name"
+            htmlFor="firstName"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            Name
+            First Name
           </label>
           <input
             type="text"
-            id="name"
-            name="name"
-            placeholder="Name"
-            value={formData.name}
+            id="firstName"
+            name="firstName"
+            placeholder="First Name"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+            className="p-4 mt-1 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="lastName"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Last Name
+          </label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            placeholder="Last Name"
+            value={formData.lastName}
             onChange={handleChange}
             required
             className="p-4 mt-1 block w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 disabled:opacity-50 disabled:pointer-events-none"

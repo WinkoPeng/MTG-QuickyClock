@@ -20,7 +20,10 @@ export default function Home() {
 
       if (verifiedUser) {
         const userData = verifiedUser;
-        localStorage.setItem("userName", userData.name);
+        localStorage.setItem(
+          "userName",
+          `${userData.firstName} ${userData.lastName}`
+        ); // Store user name
         localStorage.setItem("userId", mtgId); // Store user ID
         router.push("/employee");
       } else {
@@ -40,7 +43,10 @@ export default function Home() {
     if (verifiedUser) {
       const userData = verifiedUser;
       if (userData.class === "admin") {
-        localStorage.setItem("adminName", userData.name); // Store admin name
+        localStorage.setItem(
+          "adminName",
+          `${userData.firstName} ${userData.lastName}`
+        ); // Store admin name
         localStorage.setItem("userId", mtgId); // Store user ID
         router.push("/admin");
       } else {

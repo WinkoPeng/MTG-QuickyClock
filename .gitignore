@@ -8,6 +8,7 @@
 
 # Ignore firebase config file
 firebase.js
+.firebase/
 
 # Ignore local environment variables
 .env.local

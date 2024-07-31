@@ -124,7 +124,7 @@ export default function GeofenceSetup() {
   return (
     <div className="flex flex-col md:flex-row p-4 gap-4">
       {/* Map Container */}
-      <div className="relative flex-1 h-[400px] md:h-[75vh] bg-gray-800 rounded-lg shadow-md">
+      <div className="relative flex-1 h-[400px] md:h-[75vh] dark:bg-gray-800 rounded-lg shadow-md">
         <SearchBox
           accessToken={accessToken}
           map={mapInstanceRef.current}
@@ -144,12 +144,12 @@ export default function GeofenceSetup() {
       </div>
 
       {/* Form Container */}
-      <div className="flex-1 max-w-md p-4 bg-gray-900 text-gray-200 rounded-lg shadow-lg">
+      <div className="flex-1 max-w-md p-4 dark:bg-gray-900 text-gray-200 rounded-lg shadow-lg">
         {!selectedLocation && (
-          <div className="mb-4 p-4 border border-dashed border-gray-700 rounded-md text-center bg-gray-800">
-            <p className="text-gray-400">
-              Please search for a location, then double-click on the intended
-              result in the resulting list.
+          <div className="mb-4 p-4 border border-dashed border-gray-700 rounded-md text-center dark:bg-gray-800">
+            <p className="text-black dark:text-gray-400">
+              Please search for a location, then double-click on the desired
+              selection in the resulting list.
             </p>
           </div>
         )}

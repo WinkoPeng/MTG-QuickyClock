@@ -29,6 +29,7 @@ const Sidebar = ({
   handlePendingMessages,
   isSidebarOpen,
   setIsSidebarOpen,
+  pendingMessages,
 }) => {
   const sidebarRef = useRef(null);
 
@@ -84,32 +85,46 @@ const Sidebar = ({
         } md:relative md:translate-x-0 overflow-y-auto`}
         aria-label="Sidebar"
       >
+        {/* Sidebar Content */}
         <div className="flex flex-col flex-grow">
+          {/* Welcome Section */}
           <div className="text-center mb-6">
             <h3 className="text-lg font-semibold">Welcome,</h3>
             <h2 className="text-xl font-bold">{adminName}</h2>
           </div>
+
+          {/* Navigation Links */}
           <div className="flex flex-col flex-grow space-y-2">
             {Object.keys(pageIcons).map((page) => {
               const Icon = pageIcons[page];
               return (
                 <button
                   key={page}
-                  className={`text-left py-2 px-4 rounded transition-colors focus:outline-none flex items-center space-x-2 ${
+                  className={`w-full text-left text-sm py-2 px-4 rounded transition-colors focus:outline-none flex items-center space-x-2 ${
                     selectedPage === page
                       ? "bg-accent text-white"
                       : "bg-primaryDark text-gray-200 hover:bg-accent focus:bg-accent"
+                  } ${
+                    page === "Employee Messages" && pendingMessages > 0
+                      ? "animate-blink-bg" // Apply the blink-bg animation if the conditions are met
+                      : ""
                   }`}
                   onClick={() => handlePageChange(page)}
                   aria-label={`Go to ${page}`}
                 >
                   <Icon className="h-6 w-6 flex-shrink-0" aria-hidden="true" />
-                  <span>{page}</span>
+                  <span>
+                    {page === "Employee Messages" && pendingMessages > 0
+                      ? `${page} (${pendingMessages})`
+                      : page}
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
+
+        {/* Logout Button */}
         <div className="text-center mt-4">
           <button
             className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 rounded text-white focus:outline-none"

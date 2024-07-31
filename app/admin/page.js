@@ -34,20 +34,28 @@ const Admin = () => {
     if (name) {
       setAdminName(name);
     }
+    console.log("Admin name:", adminName);
     fetchMessages();
   }, []);
 
   const fetchMessages = async () => {
-    const q = query(
-      collection(db, "messages"),
-      where("status", "==", "pending")
-    );
-    const querySnapshot = await getDocs(q);
-    setPendingMessages(!querySnapshot.empty);
+    try {
+      const q = query(
+        collection(db, "messages"),
+        where("status", "==", "pending")
+      );
+      const querySnapshot = await getDocs(q);
+
+      // Set pendingMessages based on whether there are any pending messages
+      setPendingMessages(querySnapshot.size);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminName");
+    localStorage.removeItem("adminFirstName");
+    localStorage.removeItem("adminLastName");
     router.push("/");
   };
 
@@ -101,6 +109,7 @@ const Admin = () => {
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         handleLogout={handleLogout}
+        pendingMessages={pendingMessages}
       />
 
       {/* Main Content */}

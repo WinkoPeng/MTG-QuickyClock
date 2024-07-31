@@ -73,32 +73,34 @@ function EmployeeList({ onEdit, onAdd }) {
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search employees..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="p-1 text-sm border rounded-md w-full md:w-1/3 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-        />
-        <div className="flex flex-col md:flex-row gap-4 w-full md:w-2/3">
+      <div className="flex flex-col md:flex-row gap-3 mb-4">
+        <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto flex-grow">
+          <input
+            type="text"
+            placeholder="Search employees..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="p-2 text-sm border rounded-md w-full md:w-1/3 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+          />
           <select
             value={filter}
             onChange={handleFilterChange}
-            className="p-1 text-sm border rounded-md w-full md:w-1/4 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="p-2 text-sm border rounded-md w-full md:w-1/4 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
           >
             <option value="all">Show All</option>
-            <option value="online">Online Only</option>
+            <option value="online">Clocked In Only</option>
             <option value="workingToday">Working Today</option>
             <option value="offToday">Off Today</option>
           </select>
         </div>
-        <button
-          onClick={() => onAdd()}
-          className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
-        >
-          Add New Employee
-        </button>
+        <div className="flex justify-end w-full md:w-auto">
+          <button
+            onClick={() => onAdd()}
+            className="p-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
+          >
+            Add New Employee
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -108,7 +110,7 @@ function EmployeeList({ onEdit, onAdd }) {
             className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md text-center"
           >
             <h3 className="text-lg font-semibold mb-2 dark:text-gray-100">
-              {employee.name} - {employee.title}
+              {employee.firstName} {employee.lastName} - {employee.title}
             </h3>
             <p className="text-sm mb-2 dark:text-gray-200">
               Status:{" "}
@@ -119,7 +121,7 @@ function EmployeeList({ onEdit, onAdd }) {
                     : "text-gray-500 dark:text-gray-400"
                 }`}
               >
-                {employee.status === "online" ? "Online" : "Offline"}
+                {employee.status === "online" ? "Clocked In" : "Clocked Out"}
               </span>
             </p>
             <p className="text-sm mb-2 dark:text-gray-200">

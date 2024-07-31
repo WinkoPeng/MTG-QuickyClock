@@ -30,3 +30,13 @@
 .text-accent {
   color: var(--accent);
 }
+
+@keyframes blink-bg {
+  50% {
+    background-color: rgb(255, 128, 0); /* Accent color */
+  }
+}
+
+.animate-blink-bg {
+  animation: blink-bg 2s infinite;
+}

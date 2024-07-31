@@ -21,7 +21,8 @@ function Edit({ employee, onCancel }) {
   const [formData, setFormData] = useState({
     id: "",
     password: "",
-    name: "",
+    firstName: "",
+    lastName: "",
     class: "employee",
     title: "Administrative Officer",
     gender: "male",
@@ -38,12 +39,12 @@ function Edit({ employee, onCancel }) {
       Saturday: { start: "", end: "" },
       Sunday: { start: "", end: "" },
     },
-    lastMonthWorkDuration: { hours: 0, minutes: 0 },
+    /*lastMonthWorkDuration: { hours: 0, minutes: 0 },
     lastOnlineDate: "",
     thisMonthWorkDuration: { hours: 0, minutes: 0 },
     twoWeeksWorkDuration: { hours: 0, minutes: 0 },
     workDurationToday: { hours: 0, minutes: 0 },
-    totalWorkDuration: { hours: 0, minutes: 0 },
+    totalWorkDuration: { hours: 0, minutes: 0 },*/
   });
 
   const [selectedDate, setSelectedDate] = useState("");
@@ -51,7 +52,8 @@ function Edit({ employee, onCancel }) {
     hours: 0,
     minutes: 0,
   });
-  const [selectedDateWorkTime, setSelectedDateWorkTime] = useState("");
+  const [selectedDateClockIn, setSelectedDateClockIn] = useState("");
+  const [selectedDateClockOut, setSelectedDateClockOut] = useState("");
 
   useEffect(() => {
     const fetchGeofences = async () => {
@@ -67,11 +69,11 @@ function Edit({ employee, onCancel }) {
 
     if (employee) {
       const {
-        lastMonthWorkDuration,
-        thisMonthWorkDuration,
-        twoWeeksWorkDuration,
-        workDurationToday,
-        totalWorkDuration,
+        //lastMonthWorkDuration,
+        //thisMonthWorkDuration,
+        //twoWeeksWorkDuration,
+        //workDurationToday,
+        //totalWorkDuration,
         workHours,
         workPeriod,
         workTime,
@@ -81,7 +83,7 @@ function Edit({ employee, onCancel }) {
       setFormData({
         ...rest,
         workHours: transformWorkHours(workHours),
-        lastMonthWorkDuration: convertMinutesToHoursAndMinutes(
+        /*lastMonthWorkDuration: convertMinutesToHoursAndMinutes(
           lastMonthWorkDuration
         ),
         thisMonthWorkDuration: convertMinutesToHoursAndMinutes(
@@ -90,19 +92,13 @@ function Edit({ employee, onCancel }) {
         twoWeeksWorkDuration:
           convertMinutesToHoursAndMinutes(twoWeeksWorkDuration),
         workDurationToday: convertMinutesToHoursAndMinutes(workDurationToday),
-        totalWorkDuration: convertMinutesToHoursAndMinutes(totalWorkDuration),
+        totalWorkDuration: convertMinutesToHoursAndMinutes(totalWorkDuration),*/
       });
 
-      if (workPeriod && selectedDate && workPeriod[selectedDate]) {
+      if (workPeriod && selectedDate) {
         setSelectedDateWorkDuration(
           convertMinutesToHoursAndMinutes(workPeriod[selectedDate])
         );
-      }
-
-      if (workTime && selectedDate && workTime[selectedDate]) {
-        setSelectedDateWorkTime(workTime[selectedDate]);
-      } else {
-        setSelectedDateWorkTime("");
       }
     }
   }, [employee, selectedDate]);
@@ -166,6 +162,14 @@ function Edit({ employee, onCancel }) {
     }
   };
 
+  const handleClockInChange = (e) => {
+    setSelectedDateClockIn(e.target.value);
+  };
+
+  const handleClockOutChange = (e) => {
+    setSelectedDateClockOut(e.target.value);
+  };
+
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
     if (employee.workPeriod && employee.workPeriod[e.target.value]) {
@@ -175,16 +179,6 @@ function Edit({ employee, onCancel }) {
     } else {
       setSelectedDateWorkDuration({ hours: 0, minutes: 0 });
     }
-
-    if (employee.workTime && employee.workTime[e.target.value]) {
-      setSelectedDateWorkTime(employee.workTime[e.target.value]);
-    } else {
-      setSelectedDateWorkTime("");
-    }
-  };
-
-  const handleWorkTimeChange = (e) => {
-    setSelectedDateWorkTime(e.target.value);
   };
 
   const handleSubmit = async (e) => {
@@ -211,26 +205,6 @@ function Edit({ employee, onCancel }) {
       const updatedFormData = {
         ...formData,
 
-        lastMonthWorkDuration: convertHoursAndMinutesToMinutes(
-          formData.lastMonthWorkDuration
-        ),
-
-        thisMonthWorkDuration: convertHoursAndMinutesToMinutes(
-          formData.thisMonthWorkDuration
-        ),
-
-        twoWeeksWorkDuration: convertHoursAndMinutesToMinutes(
-          formData.twoWeeksWorkDuration
-        ),
-
-        workDurationToday: convertHoursAndMinutesToMinutes(
-          formData.workDurationToday
-        ),
-
-        totalWorkDuration: convertHoursAndMinutesToMinutes(
-          formData.totalWorkDuration
-        ),
-
         workHours: Object.keys(formData.workHours).reduce((acc, day) => {
           acc[day] =
             `${formData.workHours[day].start} - ${formData.workHours[day].end}` ||
@@ -242,6 +216,10 @@ function Edit({ employee, onCancel }) {
 
       if (selectedDate) {
         if (convertHoursAndMinutesToMinutes(selectedDateWorkDuration) !== 0) {
+          console.log(
+            "selectedDateWorkDuration: ",
+            convertHoursAndMinutesToMinutes(selectedDateWorkDuration)
+          );
           updatedFormData.workPeriod = {
             ...employee.workPeriod,
 
@@ -251,12 +229,33 @@ function Edit({ employee, onCancel }) {
           };
         }
 
-        if (selectedDateWorkTime) {
-          updatedFormData.workTime = {
-            ...employee.workTime,
+        if (selectedDateClockIn && selectedDateClockOut) {
+          const clockInDateTime = new Date(
+            `${selectedDate}T${selectedDateClockIn}`
+          );
+          const clockOutDateTime = new Date(
+            `${selectedDate}T${selectedDateClockOut}`
+          );
 
-            [selectedDate]: selectedDateWorkTime,
-          };
+          const duration = Math.floor(
+            (clockOutDateTime - clockInDateTime) / (1000 * 60)
+          );
+
+          if (duration > 0) {
+            updatedFormData.workTime = {
+              ...employee.workTime,
+              [selectedDate]: [
+                {
+                  clockIn: selectedDateClockIn,
+                  clockOut: selectedDateClockOut,
+                },
+              ],
+            };
+            updatedFormData.workPeriod = {
+              ...employee.workPeriod,
+              [selectedDate]: duration,
+            };
+          }
         }
       }
 
@@ -346,16 +345,34 @@ function Edit({ employee, onCancel }) {
 
         <div className="flex flex-col space-y-2">
           <label
-            htmlFor="name"
+            htmlFor="first name"
             className="font-medium text-gray-900 dark:text-gray-100"
           >
-            Name
+            First Name
           </label>
           <input
             type="text"
-            name="name"
-            placeholder="Name"
-            value={formData.name}
+            name="firstName"
+            placeholder="First Name"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+            className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+          />
+        </div>
+
+        <div className="flex flex-col space-y-2">
+          <label
+            htmlFor="last name"
+            className="font-medium text-gray-900 dark:text-gray-100"
+          >
+            Last Name
+          </label>
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Last Name"
+            value={formData.lastName}
             onChange={handleChange}
             required
             className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
@@ -510,219 +527,54 @@ function Edit({ employee, onCancel }) {
           ))}
         </div>
 
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-4">
           <label
-            htmlFor="selectedDateWorkDuration.hours"
+            htmlFor="selectedDate"
             className="font-medium text-gray-900 dark:text-gray-100"
           >
-            Work Duration for Selected Date
+            Manually Adjust Clock In/Out Time for Selected Date
           </label>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4">
             <input
               type="date"
               name="selectedDate"
               placeholder="Selected Date"
               value={selectedDate}
               onChange={handleDateChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 w-full max-w-xs"
             />
-            <input
-              type="number"
-              name="selectedDateWorkDuration.hours"
-              placeholder="Hours"
-              value={selectedDateWorkDuration.hours}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">hours</span>
-            <input
-              type="number"
-              name="selectedDateWorkDuration.minutes"
-              placeholder="Minutes"
-              value={selectedDateWorkDuration.minutes}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">mins</span>
           </div>
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label
-            htmlFor="selectedDateWorkTime"
-            className="font-medium text-gray-900 dark:text-gray-100"
-          >
-            Start Time - End Time
-          </label>
-          <input
-            type="text"
-            name="selectedDateWorkTime"
-            placeholder="Start time & End time"
-            value={selectedDateWorkTime}
-            onChange={handleWorkTimeChange}
-            className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label
-            htmlFor="lastOnlineDate"
-            className="font-medium text-gray-900 dark:text-gray-100"
-          >
-            Last Online Date
-          </label>
-          <input
-            type="date"
-            name="lastOnlineDate"
-            placeholder="Last Online Date"
-            value={formData.lastOnlineDate}
-            onChange={handleChange}
-            className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label
-            htmlFor="lastMonthWorkDuration.hours"
-            className="font-medium text-gray-900 dark:text-gray-100"
-          >
-            Last Month Work Duration
-          </label>
-          <div className="flex items-center space-x-2">
-            <input
-              type="number"
-              name="lastMonthWorkDuration.hours"
-              placeholder="Hours"
-              value={formData.lastMonthWorkDuration.hours}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">hours</span>
-            <input
-              type="number"
-              name="lastMonthWorkDuration.minutes"
-              placeholder="Minutes"
-              value={formData.lastMonthWorkDuration.minutes}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">mins</span>
-          </div>
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label
-            htmlFor="thisMonthWorkDuration.hours"
-            className="font-medium text-gray-900 dark:text-gray-100"
-          >
-            This Month Work Duration
-          </label>
-          <div className="flex items-center space-x-2">
-            <input
-              type="number"
-              name="thisMonthWorkDuration.hours"
-              placeholder="Hours"
-              value={formData.thisMonthWorkDuration.hours}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">hours</span>
-            <input
-              type="number"
-              name="thisMonthWorkDuration.minutes"
-              placeholder="Minutes"
-              value={formData.thisMonthWorkDuration.minutes}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">mins</span>
-          </div>
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label
-            htmlFor="twoWeeksWorkDuration.hours"
-            className="font-medium text-gray-900 dark:text-gray-100"
-          >
-            Two Weeks Work Duration
-          </label>
-          <div className="flex items-center space-x-2">
-            <input
-              type="number"
-              name="twoWeeksWorkDuration.hours"
-              placeholder="Hours"
-              value={formData.twoWeeksWorkDuration.hours}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">hours</span>
-            <input
-              type="number"
-              name="twoWeeksWorkDuration.minutes"
-              placeholder="Minutes"
-              value={formData.twoWeeksWorkDuration.minutes}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">mins</span>
-          </div>
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label
-            htmlFor="workDurationToday.hours"
-            className="font-medium text-gray-900 dark:text-gray-100"
-          >
-            Work Duration Today
-          </label>
-          <div className="flex items-center space-x-2">
-            <input
-              type="number"
-              name="workDurationToday.hours"
-              placeholder="Hours"
-              value={formData.workDurationToday.hours}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">hours</span>
-            <input
-              type="number"
-              name="workDurationToday.minutes"
-              placeholder="Minutes"
-              value={formData.workDurationToday.minutes}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">mins</span>
-          </div>
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label
-            htmlFor="totalWorkDuration.hours"
-            className="font-medium text-gray-900 dark:text-gray-100"
-          >
-            Total Work Duration
-          </label>
-          <div className="flex items-center space-x-2">
-            <input
-              type="number"
-              name="totalWorkDuration.hours"
-              placeholder="Hours"
-              value={formData.totalWorkDuration.hours}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">hours</span>
-            <input
-              type="number"
-              name="totalWorkDuration.minutes"
-              placeholder="Minutes"
-              value={formData.totalWorkDuration.minutes}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-700 rounded-md p-2 w-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-            />
-            <span className="mx-1 text-gray-900 dark:text-gray-100">mins</span>
+          <div className="flex items-center space-x-4">
+            <div className="flex flex-col space-y-2 w-full max-w-xs">
+              <label
+                htmlFor="selectedDateClockIn"
+                className="font-medium text-gray-900 dark:text-gray-100"
+              >
+                Clock In Time
+              </label>
+              <input
+                type="time"
+                name="selectedDateClockIn"
+                value={selectedDateClockIn}
+                onChange={handleClockInChange}
+                className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 w-full"
+              />
+            </div>
+            <div className="flex flex-col space-y-2 w-full max-w-xs">
+              <label
+                htmlFor="selectedDateClockOut"
+                className="font-medium text-gray-900 dark:text-gray-100"
+              >
+                Clock Out Time
+              </label>
+              <input
+                type="time"
+                name="selectedDateClockOut"
+                value={selectedDateClockOut}
+                onChange={handleClockOutChange}
+                className="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 w-full"
+              />
+            </div>
           </div>
         </div>
 

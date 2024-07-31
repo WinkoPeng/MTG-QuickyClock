@@ -40,8 +40,8 @@ const validateLocation = async (userId) => {
     }
 
     if (!locationId) {
-      console.error("No geofence location ID found for the user");
-      return false;
+      console.error("Geofence location ID not found");
+      return true;
     }
 
     // Fetch geofence location
@@ -50,13 +50,13 @@ const validateLocation = async (userId) => {
 
     if (!locationDoc.exists()) {
       console.error("No geofence document found");
-      return false;
+      return true;
     }
 
     const location = locationDoc.data().geopoint;
     if (!location || !location.latitude || !location.longitude) {
       console.error("Invalid geofence location data");
-      return false;
+      return true;
     }
 
     // Get the user's current location

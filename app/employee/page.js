@@ -11,13 +11,7 @@ import ChangePasswordModal from "./changePasswordModal";
 import UserBulletinBoard from "./bulletin";
 import SentForms from "./sentForms";
 import Contact from "./contact";
-import {
-  handleClockIn,
-  handleClockOut,
-  updateWorkDuration,
-  handleStartBreak,
-  formatWorkDuration,
-} from "./timer";
+import { handleClockIn, handleClockOut, handleStartBreak } from "./timer";
 
 const Employee = () => {
   const router = useRouter();
@@ -169,7 +163,7 @@ const Employee = () => {
     <div className="dark:bg-gray-900">
       <div className="container mx-auto dark:bg-gray-900">
         <title>MTG - Employee</title>
-        <div className="bg-white min-w-full dark:bg-gray-900 p-4 shadow-lg">
+        <div className="bg-gray-100 min-w-full dark:bg-gray-900 p-4 shadow-lg">
           {/* Logout Button */}
           <a
             href="#"
@@ -179,7 +173,7 @@ const Employee = () => {
             Log Out
           </a>
           {/* Greeting and Time Section */}
-          <div className="bg-white min-w-full dark:bg-gray-900 p-4 shadow-lg">
+          <div className="min-w-full dark:bg-gray-900 p-4 shadow-lg">
             {/* Header Section */}
             <div className="flex items-center justify-between mb-4">
               {/* Greeting Section */}
@@ -191,7 +185,7 @@ const Employee = () => {
             </div>
 
             {/* Time Section */}
-            <div className="text-sm md:text-base lg:text-lg xl:text-xl bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md text-center md:text-left lg:text-center">
+            <div className="text-sm md:text-base lg:text-lg xl:text-xl dark:bg-gray-800 p-2 rounded-lg shadow-md text-center md:text-left lg:text-center">
               <p className="text-gray-900 dark:text-gray-100">
                 Current Time:{" "}
                 <span className="font-semibold">{currentTime}</span>
@@ -209,7 +203,7 @@ const Employee = () => {
           {/* Announcements and Clock In/Out */}
           <div className="flex flex-col md:flex-row md:space-x-4 mt-4">
             {/* Announcements */}
-            <div className="w-full md:w-2/3 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+            <div className="w-full md:w-2/3 bg-gray-200 dark:bg-gray-800 p-4 rounded-lg shadow-lg">
               <UserBulletinBoard />
             </div>
 
@@ -264,107 +258,33 @@ const Employee = () => {
                 )}
               </div>
 
-              {/* Break Section */}
-              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-4xl mx-auto">
-                <div className="flex flex-col md:flex-row gap-4 mb-4 flex-wrap">
-                  {/* Select Break Time */}
-                  <div className="flex items-center gap-2 flex-1 min-w-[150px]">
-                    <input
-                      type="radio"
-                      name="breakOption"
-                      value="select"
-                      checked={selectedOption === "select"}
-                      onChange={handleOptionChange}
-                      disabled={!isClockedIn}
-                      className="form-radio text-blue-500 dark:text-blue-400"
-                    />
-                    <select
-                      className={`p-2 border rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${
-                        selectedOption !== "select" || !isClockedIn
-                          ? "bg-gray-200 dark:bg-gray-800"
-                          : ""
-                      }`}
-                      value={breakTime}
-                      onChange={handleBreakTimeChange}
-                      disabled={selectedOption !== "select" || !isClockedIn}
-                    >
-                      <option value="15">15 min</option>
-                      <option value="30">30 min</option>
-                      <option value="45">45 min</option>
-                      <option value="60">60 min</option>
-                    </select>
-                  </div>
-
-                  {/* Custom Break Time */}
-                  <div className="flex items-center gap-2 flex-1 min-w-[150px]">
-                    <input
-                      type="radio"
-                      name="breakOption"
-                      value="custom"
-                      checked={selectedOption === "custom"}
-                      onChange={handleOptionChange}
-                      disabled={!isClockedIn}
-                      className="form-radio text-blue-500 dark:text-blue-400"
-                    />
-                    <input
-                      type="number"
-                      className={`p-2 border rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${
-                        selectedOption !== "custom" || !isClockedIn
-                          ? "bg-gray-200 dark:bg-gray-800"
-                          : ""
-                      }`}
-                      placeholder="Custom"
-                      value={customBreakTime}
-                      onChange={handleCustomBreakTimeChange}
-                      disabled={selectedOption !== "custom" || !isClockedIn}
-                      min="1"
-                    />
-                  </div>
-
-                  {/* Start Break Button */}
-                  <button
-                    className={`flex-shrink-0 px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      !isClockedIn || isOnBreak
-                        ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                        : ""
-                    }`}
-                    onClick={handleStartBreakClick}
-                    disabled={!isClockedIn || isOnBreak}
-                  >
-                    Start Break
-                  </button>
-                </div>
+              <div className="flex flex-row space-x-4 sm:flex-col sm:space-x-0 sm:space-y-4 mt-4">
+                <button
+                  className="w-full py-2 px-4 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  onClick={() => setShowContactModal(true)}
+                >
+                  Contact Admins
+                </button>
+                <button
+                  className="w-full py-2 px-4 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  onClick={() => setSentFormsModal(true)}
+                >
+                  View Sent Contact Forms
+                </button>
+                <button
+                  className="w-full py-2 px-4 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  onClick={() => setShowPasswordModal(true)}
+                >
+                  Change Password
+                </button>
               </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col space-y-2 mt-4">
-            <div className="flex flex-row gap-4">
-              <button
-                className="w-full py-2 px-4 sm:py-1 sm:px-2 text-base sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
-                onClick={() => setShowContactModal(true)}
-              >
-                Contact Admins
-              </button>
-              <button
-                className="w-full py-2 px-4 sm:py-1 sm:px-2 text-base sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
-                onClick={() => setSentFormsModal(true)}
-              >
-                View Sent Contact Forms
-              </button>
-              <button
-                className="w-full py-2 px-4 sm:py-1 sm:px-2 text-base sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
-                onClick={() => setShowPasswordModal(true)}
-              >
-                Change Password
-              </button>
             </div>
           </div>
 
           <WorkHours employeeId={userId} />
 
           {log.length > 0 && (
-            <div className="mt-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+            <div className="mt-4 bg-gray-200 dark:bg-gray-800 p-4 rounded-lg shadow-lg">
               <table className="w-full text-left text-gray-900 dark:text-gray-100">
                 <thead>
                   <tr className="border-b dark:border-gray-700">

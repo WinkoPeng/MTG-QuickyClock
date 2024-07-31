@@ -110,7 +110,7 @@ const UserBulletinBoard = () => {
               </svg>
             </button>
             <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-              All Bulletins
+              All Announcements
             </h2>
             <ul className="space-y-2">
               {bulletins.map((bulletin) => (

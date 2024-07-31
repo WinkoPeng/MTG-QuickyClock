@@ -35,25 +35,31 @@ const GeofenceDisplay = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-900 text-gray-200">
+    <div className="p-4 bg-gray-100 dark:bg-gray-900 dark:text-gray-200">
       <h2 className="text-2xl font-semibold mb-4">Geofences</h2>
       {geofences.length > 0 ? (
-        <table className="min-w-full bg-gray-800 border border-gray-700 rounded-lg shadow-md">
-          <thead className="bg-gray-700 border-b border-gray-600">
+        <table className="min-w-full dark:bg-gray-800 border border-gray-700 rounded-lg shadow-md">
+          <thead className="dark:bg-gray-700 border-b border-gray-600">
             <tr>
-              <th className="px-6 py-3 text-left text-gray-300">Name</th>
-              <th className="px-6 py-3 text-left text-gray-300">Address</th>
-              <th className="px-6 py-3 text-left text-gray-300"></th>
+              <th className="px-6 py-3 text-left dark:text-gray-300">Name</th>
+              <th className="px-6 py-3 text-left dark:text-gray-300">
+                Address
+              </th>
+              <th className="px-6 py-3 text-left dark:text-gray-300"></th>
             </tr>
           </thead>
           <tbody>
             {geofences.map((geofence) => (
               <tr
                 key={geofence.id}
-                className="border-b border-gray-700 hover:bg-gray-600"
+                className="border-b border-gray-700 dark:hover:bg-gray-600"
               >
-                <td className="px-6 py-4 text-gray-200">{geofence.name}</td>
-                <td className="px-6 py-4 text-gray-200">{geofence.address}</td>
+                <td className="px-6 py-4 dark:text-gray-200">
+                  {geofence.name}
+                </td>
+                <td className="px-6 py-4 dark:text-gray-200">
+                  {geofence.address}
+                </td>
                 <td className="px-6 py-4">
                   <button
                     onClick={() => handleDelete(geofence.id)}

@@ -20,6 +20,14 @@ const SentForms = ({ userId, showSentFormsModal, setSentFormsModal }) => {
           id: doc.id,
           ...doc.data(),
         }));
+
+        // Sort forms by the most recent date
+        formsData.sort((a, b) => {
+          const dateA = new Date(a.createdAt.seconds * 1000);
+          const dateB = new Date(b.createdAt.seconds * 1000);
+          return dateB - dateA; // Sort in descending order
+        });
+
         setForms(formsData);
       } catch (err) {
         setError("Error fetching messages");
@@ -39,7 +47,7 @@ const SentForms = ({ userId, showSentFormsModal, setSentFormsModal }) => {
     <>
       {showSentFormsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg relative">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg relative max-h-[80vh] overflow-y-auto">
             <button
               className="absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
               onClick={() => setSentFormsModal(false)}
