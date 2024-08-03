@@ -187,9 +187,9 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-gray-200 dark:bg-gray-900">
+    <div className="flex flex-col gap-4 p-4 bg-light dark:bg-gray-900">
       {/* Search and filter inputs */}
-      <div className="mb-4">
+      <div className="mb-4 bg-lighter dark:bg-gray-800 p-2 rounded-lg">
         <input
           type="text"
           placeholder="Search employee by name"
@@ -203,7 +203,7 @@ function Dashboard() {
             setTitleFilter(e.target.value);
             applyFilters(searchTerm, e.target.value);
           }}
-          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-4 dark:bg-gray-900 dark:text-gray-100"
+          className="w-full p-2 border border-gray-300 bg-white dark:border-gray-600 rounded-lg mb-4 dark:bg-gray-900 dark:text-gray-100"
         >
           <option value="All Positions">All Positions</option>
           <option value="Instructor">Instructor</option>

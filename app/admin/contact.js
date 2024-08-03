@@ -103,7 +103,7 @@ const Contact = ({ userName, updateMessages }) => {
   }, [currentPage]);
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-800 min-h-screen">
+    <div className="p-6 bg-lighter dark:bg-gray-800 min-h-screen">
       {/* Top ref for scrolling */}
       <div ref={topRef}></div>
 
@@ -148,64 +148,64 @@ const Contact = ({ userName, updateMessages }) => {
         {currentItems.map((form) => (
           <li
             key={form.id}
-            className="p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-md"
+            className="p-4 bg-light dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-md"
           >
-            <div className="space-y-2">
-              <div className="p-2 bg-gray-100 dark:bg-gray-600 rounded-md">
-                <p className="text-gray-800 dark:text-gray-200 font-medium">
-                  Employee ID:
-                </p>
-                <p className="text-gray-800 dark:text-gray-200">
-                  {form.userId}
-                </p>
-              </div>
-              <div className="p-2 bg-gray-100 dark:bg-gray-600 rounded-md">
-                <p className="text-gray-800 dark:text-gray-200 font-medium">
-                  Name:
-                </p>
-                <p className="text-gray-800 dark:text-gray-200">{form.name}</p>
-              </div>
-              <div className="p-2 bg-gray-100 dark:bg-gray-600 rounded-md">
-                <p className="text-gray-800 dark:text-gray-200 font-medium">
-                  Time:
-                </p>
-                <p className="text-gray-800 dark:text-gray-200">
-                  {form.createdAt.toDate().toLocaleString()}
-                </p>
-              </div>
-              <div className="p-2 bg-gray-100 dark:bg-gray-600 rounded-md">
-                <p className="text-gray-800 dark:text-gray-200 font-medium">
-                  Message:
-                </p>
-                <p className="text-gray-800 dark:text-gray-200">
-                  {form.message}
-                </p>
-              </div>
-              <div className="p-2 bg-gray-100 dark:bg-gray-600 rounded-md">
-                <p className="text-gray-800 dark:text-gray-200 font-medium">
-                  Status:
-                </p>
-                <p className="text-gray-800 dark:text-gray-200">
-                  {form.status}
-                </p>
-              </div>
-              {form.status === "pending" && (
-                <div className="mt-2">
-                  <button
-                    onClick={() => {
-                      handleUpdateStatus(
-                        form.id,
-                        `Resolved by ${adminName} at ${new Date().toLocaleString()}`
-                      );
-                      updateMessages(); // Callback to update messages in parent component
-                    }}
-                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
-                  >
-                    Mark as Resolved
-                  </button>
+            <div className="flex items-start justify-between space-x-4 mb-2">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">
+                    Employee ID:
+                  </p>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {form.userId}
+                  </p>
                 </div>
-              )}
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">
+                    Name:
+                  </p>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {form.name}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">
+                    Time:
+                  </p>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {form.createdAt.toDate().toLocaleString()}
+                  </p>
+                </div>
+              </div>
             </div>
+            <div className="p-2 bg-lighter dark:bg-gray-600 rounded-md mb-2">
+              <p className="text-gray-800 dark:text-gray-200 font-medium">
+                Message:
+              </p>
+              <p className="text-gray-800 dark:text-gray-200">{form.message}</p>
+            </div>
+            <div className="p-2 bg-lighter dark:bg-gray-600 rounded-md">
+              <p className="text-gray-800 dark:text-gray-200 font-medium">
+                Status:
+              </p>
+              <p className="text-gray-800 dark:text-gray-200">{form.status}</p>
+            </div>
+            {form.status === "pending" && (
+              <div className="mt-2">
+                <button
+                  onClick={() => {
+                    handleUpdateStatus(
+                      form.id,
+                      `Resolved by ${adminName} at ${new Date().toLocaleString()}`
+                    );
+                    updateMessages(); // Callback to update messages in parent component
+                  }}
+                  className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
+                >
+                  Mark as Resolved
+                </button>
+              </div>
+            )}
           </li>
         ))}
       </ul>

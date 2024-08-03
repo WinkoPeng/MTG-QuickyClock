@@ -44,12 +44,12 @@ const WorkHours = ({ employeeId }) => {
   );
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="p-6 bg-light dark:bg-gray-900 min-h-screen">
       <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">
         Your Weekly Work Hours
       </h2>
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
+        <table className="min-w-full bg-lighter dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-700 text-left text-gray-600 dark:text-gray-300">
               <th className="px-6 py-3 border-b border-gray-200 dark:border-gray-600">

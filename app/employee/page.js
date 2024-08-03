@@ -11,6 +11,7 @@ import ChangePasswordModal from "./changePasswordModal";
 import UserBulletinBoard from "./bulletin";
 import SentForms from "./sentForms";
 import Contact from "./contact";
+import Header from "./header";
 import { handleClockIn, handleClockOut, handleStartBreak } from "./timer";
 
 const Employee = () => {
@@ -160,20 +161,13 @@ const Employee = () => {
   };
 
   return (
-    <div className="dark:bg-gray-900">
+    <div className="bg-light dark:bg-gray-900">
+      <Header title="Employee" adminName={userName} onLogout={handleLogout} />
       <div className="container mx-auto dark:bg-gray-900">
         <title>MTG - Employee</title>
-        <div className="bg-gray-100 min-w-full dark:bg-gray-900 p-4 shadow-lg">
-          {/* Logout Button */}
-          <a
-            href="#"
-            className="text-red-600 dark:text-red-400 hover:underline text-xs sm:text-sm md:text-base"
-            onClick={handleLogout}
-          >
-            Log Out
-          </a>
+        <div className="bg-light min-w-full dark:bg-gray-900">
           {/* Greeting and Time Section */}
-          <div className="min-w-full dark:bg-gray-900 p-4 shadow-lg">
+          <div className="min-w-full dark:bg-gray-900 pt-2">
             {/* Header Section */}
             <div className="flex items-center justify-between mb-4">
               {/* Greeting Section */}
@@ -185,7 +179,7 @@ const Employee = () => {
             </div>
 
             {/* Time Section */}
-            <div className="text-sm md:text-base lg:text-lg xl:text-xl dark:bg-gray-800 p-2 rounded-lg shadow-md text-center md:text-left lg:text-center">
+            <div className="text-sm md:text-base lg:text-lg xl:text-xl bg-light dark:bg-gray-800 rounded-lg text-center md:text-left lg:text-center">
               <p className="text-gray-900 dark:text-gray-100">
                 Current Time:{" "}
                 <span className="font-semibold">{currentTime}</span>
@@ -203,14 +197,14 @@ const Employee = () => {
           {/* Announcements and Clock In/Out */}
           <div className="flex flex-col md:flex-row md:space-x-4 mt-4">
             {/* Announcements */}
-            <div className="w-full md:w-2/3 bg-gray-200 dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+            <div className="w-full md:w-2/3 bg-gray-200 bg-light dark:bg-dark rounded-lg">
               <UserBulletinBoard />
             </div>
 
             {/* Clock In/Out and Break Section */}
-            <div className="w-full md:w-1/3 flex flex-col space-y-4">
+            <div className="w-full dark:bg-dark rounded-lg bg-light md:w-1/3 flex flex-col space-y-4">
               {/* Clock In/Out */}
-              <div className="space-y-2">
+              <div className="space-y-2 pb-2">
                 {!isClockedIn ? (
                   <button
                     className={`w-full h-full py-5 text-4xl px-4 rounded-full ${
@@ -284,7 +278,7 @@ const Employee = () => {
           <WorkHours employeeId={userId} />
 
           {log.length > 0 && (
-            <div className="mt-4 bg-gray-200 dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+            <div className="mt-4 bg-light dark:bg-gray-800 p-4 rounded-lg">
               <table className="w-full text-left text-gray-900 dark:text-gray-100">
                 <thead>
                   <tr className="border-b dark:border-gray-700">

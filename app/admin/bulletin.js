@@ -99,8 +99,8 @@ const Bulletin = ({ userId, userName }) => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-6">
+    <div className="py-6 bg-light dark:bg-gray-900 min-h-screen">
+      <div className="bg-lighter dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-6">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
           Make an Announcement
         </h2>
@@ -111,7 +111,7 @@ const Bulletin = ({ userId, userName }) => {
             setNewBulletin({ ...newBulletin, title: e.target.value })
           }
           placeholder="Title"
-          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg mb-4 text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg mb-4 text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
         />
         <textarea
           value={newBulletin.message}
@@ -119,7 +119,7 @@ const Bulletin = ({ userId, userName }) => {
             setNewBulletin({ ...newBulletin, message: e.target.value })
           }
           placeholder="Message"
-          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
           rows="4"
         />
         <button
@@ -135,7 +135,7 @@ const Bulletin = ({ userId, userName }) => {
         </button>
       </div>
 
-      <div>
+      <div className="bg-lighter p-2 rounded-xl dark:bg-gray-800">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
           Announcements
         </h2>
@@ -143,7 +143,7 @@ const Bulletin = ({ userId, userName }) => {
           {bulletins.map((bulletin) => (
             <li
               key={bulletin.id}
-              className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md"
+              className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md"
             >
               <div className="mb-2">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

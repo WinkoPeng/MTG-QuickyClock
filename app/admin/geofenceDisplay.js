@@ -35,7 +35,7 @@ const GeofenceDisplay = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-100 dark:bg-gray-900 dark:text-gray-200">
+    <div className="p-4 bg-lighter rounded-lg dark:bg-gray-900 dark:text-gray-200">
       <h2 className="text-2xl font-semibold mb-4">Geofences</h2>
       {geofences.length > 0 ? (
         <table className="min-w-full dark:bg-gray-800 border border-gray-700 rounded-lg shadow-md">

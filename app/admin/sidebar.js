@@ -80,17 +80,32 @@ const Sidebar = ({
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed inset-y-0 left-0 w-48 bg-primaryDark text-white h-full p-4 flex flex-col justify-between transition-transform duration-300 transform z-50 ${
+        className={`fixed inset-y-0 left-0 w-48 bg-primaryDark text-white h-full py-4 px-2 flex flex-col justify-between transition-transform duration-300 transform z-50 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0 overflow-y-auto`}
         aria-label="Sidebar"
       >
         {/* Sidebar Content */}
         <div className="flex flex-col flex-grow">
-          {/* Welcome Section */}
+          {/* Header Section */}
           <div className="text-center mb-6">
-            <h3 className="text-lg font-semibold">Welcome,</h3>
-            <h2 className="text-xl font-bold">{adminName}</h2>
+            <div className="flex items-center justify-center mb-2 -ml-3">
+              <img
+                src="/images/mtglogo.png"
+                alt="MTG Logo"
+                width={48}
+                height={48}
+                className="mr-0"
+                style={{ alignSelf: "center" }}
+              />
+              <div className="leading-tight">
+                <h2 className="text-md font-bold">
+                  MTG Healthcare Administration
+                </h2>
+              </div>
+            </div>
+            <h2 className="">Welcome,</h2>
+            <h3 className="font-semibold">{adminName}</h3>
           </div>
 
           {/* Navigation Links */}

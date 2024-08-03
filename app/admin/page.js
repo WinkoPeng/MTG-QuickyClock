@@ -98,7 +98,7 @@ const Admin = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
+    <div className="flex h-screen bg-light dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
       <title>MTG - Admin</title>
 
       {/* Sidebar */}
@@ -114,7 +114,7 @@ const Admin = () => {
 
       {/* Main Content */}
       <div
-        className={`flex-grow transition-all duration-300 ease-in-out p-6 bg-gray-100 dark:bg-gray-900 flex flex-col max-w-full overflow-hidden ${
+        className={`flex-grow transition-all duration-300 ease-in-out p-6 bg-light dark:bg-gray-900 flex flex-col max-w-full overflow-hidden ${
           isSidebarOpen ? "md:ml-48" : ""
         }`}
       >

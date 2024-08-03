@@ -72,7 +72,7 @@ function EmployeeList({ onEdit, onAdd }) {
   const last7Days = getLast7Days();
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div className="p-4 bg-lighter dark:bg-gray-800 rounded-lg shadow-md">
       <div className="flex flex-col md:flex-row gap-3 mb-4">
         <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto flex-grow">
           <input
@@ -85,7 +85,7 @@ function EmployeeList({ onEdit, onAdd }) {
           <select
             value={filter}
             onChange={handleFilterChange}
-            className="p-2 text-sm border rounded-md w-full md:w-1/4 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="p-2 text-sm border bg-white rounded-md w-full md:w-1/4 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
           >
             <option value="all">Show All</option>
             <option value="online">Clocked In Only</option>

@@ -144,7 +144,7 @@ export default function GeofenceSetup() {
       </div>
 
       {/* Form Container */}
-      <div className="flex-1 max-w-md p-4 dark:bg-gray-900 text-gray-200 rounded-lg shadow-lg">
+      <div className="flex-1 max-w-md p-4 bg-lighter dark:bg-gray-900 text-gray-200 rounded-lg shadow-lg">
         {!selectedLocation && (
           <div className="mb-4 p-4 border border-dashed border-gray-700 rounded-md text-center dark:bg-gray-800">
             <p className="text-black dark:text-gray-400">

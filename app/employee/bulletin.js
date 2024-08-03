@@ -42,13 +42,13 @@ const UserBulletinBoard = () => {
   const latestBulletin = bulletins.length > 0 ? bulletins[0] : null;
 
   return (
-    <div className="relative rounded-lg p-4 bg-gray-100 dark:bg-gray-900">
+    <div className="relative rounded-lg p-4 bg-light dark:bg-dark">
       <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
         Announcements
       </h1>
 
       {latestBulletin && !showAll ? (
-        <div className="p-3 bg-white dark:bg-gray-800 shadow-md rounded-lg mb-4">
+        <div className="p-3 bg-lighter dark:bg-gray-800 shadow-md rounded-lg mb-4">
           {/* Latest bulletin preview */}
           <div className="mb-1">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">

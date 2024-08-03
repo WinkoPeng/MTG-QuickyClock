@@ -218,8 +218,8 @@ const Timesheet = () => {
   }, [sortedEmployees, titleFilter]);
 
   return (
-    <div>
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
+    <div className="bg-light dark:bg-gray-900 pt-6">
+      <div className="flex flex-col md:flex-row gap-4 mb-4 bg-lighter dark:bg-gray-800 p-2 rounded-lg">
         <div className="flex flex-col w-full md:w-1/3">
           <label htmlFor="start-date" className="mb-2">
             Start Date
@@ -252,7 +252,7 @@ const Timesheet = () => {
             id="title-filter"
             value={titleFilter}
             onChange={(e) => setTitleFilter(e.target.value)}
-            className="p-2 border rounded-md w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="p-2 border bg-white rounded-md w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
           >
             <option value="All">All</option>
             <option value="Instructor">Instructor</option>
@@ -274,7 +274,7 @@ const Timesheet = () => {
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white dark:bg-gray-800">
-          <thead className="sticky top-0 bg-gray-100 dark:bg-gray-900">
+          <thead className="sticky top-0 bg-gray-100 dark:bg-gray-700">
             <tr>
               <th
                 className="py-2 px-4 border-b dark:border-gray-700 cursor-pointer"
