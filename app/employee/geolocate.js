@@ -1,11 +1,4 @@
-import {
-  collection,
-  query,
-  where,
-  getDoc,
-  getDocs,
-  doc,
-} from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
 import db from "../firebase";
 import { point, distance } from "@turf/turf";
 
@@ -19,44 +12,30 @@ const getCurrentPositionAsync = () => {
   });
 };
 
-const validateLocation = async (userId) => {
+const validateLocation = async (geofenceId) => {
   try {
-    // Fetch user data
-    const userQuery = query(
-      collection(db, "employee"),
-      where("id", "==", userId)
-    );
-    const userQuerySnap = await getDocs(userQuery);
-
-    if (userQuerySnap.empty) {
-      console.error("No user found with the given ID");
-      return false;
+    if (geofenceId === "None") {
+      return true; // No location validation needed
     }
 
-    const locationId = userQuerySnap.docs[0].data().geofence;
-
-    if (locationId == "None") {
-      return true;
-    }
-
-    if (!locationId) {
-      console.error("Geofence location ID not found");
-      return true;
+    if (!geofenceId) {
+      console.error("Geofence location ID not provided");
+      return true; // Allow clock-in if no geofence ID is provided
     }
 
     // Fetch geofence location
-    const locationRef = doc(db, "geofence", locationId);
+    const locationRef = doc(db, "geofence", geofenceId);
     const locationDoc = await getDoc(locationRef);
 
     if (!locationDoc.exists()) {
       console.error("No geofence document found");
-      return true;
+      return false;
     }
 
     const location = locationDoc.data().geopoint;
     if (!location || !location.latitude || !location.longitude) {
       console.error("Invalid geofence location data");
-      return true;
+      return false;
     }
 
     // Get the user's current location
@@ -67,13 +46,19 @@ const validateLocation = async (userId) => {
     ];
 
     const userLocation = point(userCoordinates);
+
+    console.log("User location: ", userCoordinates);
     const geofenceLocation = point([location.longitude, location.latitude]);
+
+    console.log("Geofence location: ", [location.longitude, location.latitude]);
 
     const userDistance = distance(geofenceLocation, userLocation, {
       units: "kilometers",
     });
 
-    return userDistance <= 5;
+    console.log("User distance: ", userDistance);
+
+    return userDistance <= 2; // Check if within 2 km of the geofence
   } catch (error) {
     console.error("Error validating location:", error);
     return false;

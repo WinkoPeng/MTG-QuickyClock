@@ -115,6 +115,8 @@ export default function GeofenceSetup() {
         address: selectedLocation.properties.full_address,
       });
       alert("Geofence added successfully.");
+      setGeofenceName("");
+      setSelectedLocation(null);
     } catch (error) {
       console.error("Error adding document: ", error);
       alert("Error adding geofence.");

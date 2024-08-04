@@ -12,7 +12,8 @@ import UserBulletinBoard from "./bulletin";
 import SentForms from "./sentForms";
 import Contact from "./contact";
 import Header from "./header";
-import { handleClockIn, handleClockOut, handleStartBreak } from "./timer";
+import Logs from "./logs";
+import { handleClockIn, handleClockOut } from "./timer";
 
 const Employee = () => {
   const router = useRouter();
@@ -20,66 +21,76 @@ const Employee = () => {
   const [currentTime, setCurrentTime] = useState("");
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
-  const [breakTime, setBreakTime] = useState("15");
-  const [customBreakTime, setCustomBreakTime] = useState("");
-  const [selectedOption, setSelectedOption] = useState("select");
-  const [log, setLog] = useState([]);
-  const [breakTimer, setBreakTimer] = useState(null);
   const [isClockedIn, setIsClockedIn] = useState(false);
-  const [isOnBreak, setIsOnBreak] = useState(false);
-  const [clockInTime, setClockInTime] = useState(null);
-  const [totalBreakDuration, setTotalBreakDuration] = useState(0);
   const [greeting, setGreeting] = useState("");
   const [autoLogoutTime, setAutoLogoutTime] = useState(600); // 10 minutes in seconds
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showSentFormsModal, setSentFormsModal] = useState(false);
-
-  const addLog = useCallback(
-    (message) => {
-      setLog((prevLog) => [...prevLog, { time: currentTime, message }]);
-    },
-    [currentTime]
-  );
+  const [empData, setEmpData] = useState({});
+  const [employeeDocId, setEmployeeDocId] = useState("");
 
   const handleAutoLogout = useCallback(() => {
     router.push("/");
     return 600;
   }, [router]);
 
+  const fetchData = async (storedUserId) => {
+    if (!storedUserId) return;
+
+    try {
+      const employeeQuery = query(
+        collection(db, "employee"),
+        where("id", "==", storedUserId)
+      );
+      const querySnapshot = await getDocs(employeeQuery);
+
+      if (!querySnapshot.empty) {
+        const employeeDoc = querySnapshot.docs[0];
+        const employeeData = employeeDoc.data();
+        setEmpData(employeeData);
+        setEmployeeDocId(employeeDoc.id); // Use a different name for the document ID
+        setIsClockedIn(employeeData.status === "online");
+      } else {
+        console.error("No employee found with the given ID");
+        setEmpData(null);
+        setEmployeeDocId(""); // Clear the document ID
+        setIsClockedIn(false);
+      }
+    } catch (error) {
+      console.error("Error fetching employee data:", error);
+    }
+  };
+
   useEffect(() => {
     const storedUserName = localStorage.getItem("userName");
     const storedUserId = localStorage.getItem("userId");
+
     if (storedUserName) {
       setUserName(storedUserName);
     }
     if (storedUserId) {
       setUserId(storedUserId);
+      fetchData(storedUserId); // Fetch data when userId changes
+    }
+  }, [userId]);
+
+  // Function to update fields using the stored document ID
+  const updateField = async (fieldName, value) => {
+    if (!employeeDocId) {
+      console.error("Document ID not available");
+      return;
     }
 
-    const fetchData = async () => {
-      if (storedUserId) {
-        const employeeQuery = query(
-          collection(db, "employee"),
-          where("id", "==", storedUserId)
-        );
-        const querySnapshot = await getDocs(employeeQuery);
-
-        if (!querySnapshot.empty) {
-          const employeeDoc = querySnapshot.docs[0];
-          const employeeData = employeeDoc.data();
-
-          if (employeeData.status === "online") {
-            setIsClockedIn(true);
-          } else {
-            setIsClockedIn(false);
-          }
-        }
-      }
-    };
-
-    fetchData();
-  }, [userId]);
+    try {
+      const docRef = doc(db, "employee", employeeDocId);
+      await updateDoc(docRef, {
+        [fieldName]: value,
+      });
+    } catch (error) {
+      console.error("Error updating document:", error);
+    }
+  };
 
   useEffect(() => {
     // Timer for current time and greeting
@@ -114,41 +125,6 @@ const Employee = () => {
       return () => clearInterval(autoLogoutInterval);
     }
   }, [autoLogoutTime]);
-
-  const handleBreakTimeChange = (event) => {
-    setBreakTime(event.target.value);
-    setSelectedOption("select");
-  };
-
-  const handleCustomBreakTimeChange = (event) => {
-    setCustomBreakTime(event.target.value);
-    setSelectedOption("custom");
-  };
-
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-    if (event.target.value === "select") {
-      setCustomBreakTime("");
-    } else {
-      setBreakTime("");
-    }
-  };
-
-  const handleStartBreakClick = () => {
-    let breakDuration =
-      selectedOption === "select" ? breakTime : customBreakTime;
-    if (breakDuration === "" || parseInt(breakDuration) === 0) {
-      alert("Break duration must be greater than 0 and not empty.");
-      return;
-    }
-    handleStartBreak(
-      userId,
-      setIsOnBreak,
-      setBreakTimer,
-      breakDuration,
-      addLog
-    );
-  };
 
   const handleLogout = async () => {
     try {
@@ -201,7 +177,7 @@ const Employee = () => {
               <UserBulletinBoard />
             </div>
 
-            {/* Clock In/Out and Break Section */}
+            {/* Clock In/Out Section */}
             <div className="w-full dark:bg-dark rounded-lg bg-light md:w-1/3 flex flex-col space-y-4">
               {/* Clock In/Out */}
               <div className="space-y-2 pb-2">
@@ -212,15 +188,15 @@ const Employee = () => {
                         ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
                         : "bg-green-600 text-white"
                     }`}
-                    onClick={() =>
-                      handleClockIn(
-                        userId,
-                        setClockInTime,
+                    onClick={async () => {
+                      await handleClockIn(
+                        empData,
+                        employeeDocId,
                         setIsClockedIn,
-                        addLog,
                         setIsLoading
-                      )
-                    }
+                      );
+                      fetchData(userId);
+                    }}
                     disabled={isClockedIn}
                   >
                     Clock In
@@ -232,19 +208,14 @@ const Employee = () => {
                         ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
                         : "bg-red-600 text-white"
                     }`}
-                    onClick={() =>
-                      handleClockOut(
-                        userId,
-                        setIsClockedIn,
-                        setTotalBreakDuration,
-                        addLog,
-                        clockInTime,
-                        totalBreakDuration,
-                        isOnBreak,
-                        breakTimer,
-                        setIsOnBreak
-                      )
-                    }
+                    onClick={async () => {
+                      await handleClockOut(
+                        empData,
+                        employeeDocId,
+                        setIsClockedIn
+                      );
+                      fetchData(userId);
+                    }}
                     disabled={!isClockedIn}
                   >
                     Clock Out
@@ -276,8 +247,9 @@ const Employee = () => {
           </div>
 
           <WorkHours employeeId={userId} />
+          <Logs employeeData={empData} />
 
-          {log.length > 0 && (
+          {/*log.length > 0 && (
             <div className="mt-4 bg-light dark:bg-gray-800 p-4 rounded-lg">
               <table className="w-full text-left text-gray-900 dark:text-gray-100">
                 <thead>
@@ -296,7 +268,7 @@ const Employee = () => {
                 </tbody>
               </table>
             </div>
-          )}
+          )*/}
         </div>
 
         {isLoading && (

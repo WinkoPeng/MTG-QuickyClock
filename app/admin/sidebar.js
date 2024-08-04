@@ -11,6 +11,7 @@ import {
   EnvelopeIcon,
   MapIcon,
 } from "@heroicons/react/24/outline"; // Import icons
+import Image from "next/image";
 
 const pageIcons = {
   Dashboard: HomeIcon,
@@ -66,7 +67,7 @@ const Sidebar = ({
     <div className="relative h-full">
       {/* Burger Menu Icon */}
       <button
-        className="md:hidden p-2 fixed top-4 left-4 z-50 text-white"
+        className="md:hidden p-2 fixed top-4 left-4 z-50 text-black dark:text-white"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         aria-label="Toggle sidebar"
       >
@@ -90,8 +91,8 @@ const Sidebar = ({
           {/* Header Section */}
           <div className="text-center mb-6">
             <div className="flex items-center justify-center mb-2 -ml-3">
-              <img
-                src="/images/mtglogo.png"
+              <Image
+                src="/images/mtgLogo.png"
                 alt="MTG Logo"
                 width={48}
                 height={48}

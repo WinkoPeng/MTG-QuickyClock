@@ -1,12 +1,13 @@
 // Header.js
 import React from "react";
+import Image from "next/image";
 
 const Header = ({ title, adminName, onLogout }) => {
   return (
     <div className="bg-primaryDark border-b border-b-1 border-black p-1 shadow-md flex items-center justify-between">
       <div className="flex items-center justify-center">
-        <img
-          src="/images/mtglogo.png"
+        <Image
+          src="/images/mtgLogo.png"
           alt="MTG Logo"
           width={48}
           height={48}
