@@ -4,7 +4,13 @@ import React, { useState, useEffect } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import db from "../firebase";
 
-const Contact = ({ userId, name, showContactModal, setShowContactModal }) => {
+const Contact = ({
+  userId,
+  name,
+  showContactModal,
+  setShowContactModal,
+  fetchForms,
+}) => {
   const [formData, setFormData] = useState({
     userId: "",
     name: "",
@@ -42,6 +48,7 @@ const Contact = ({ userId, name, showContactModal, setShowContactModal }) => {
         message: "",
       });
       setStatus("Form submitted successfully.");
+      fetchForms(userId);
     } catch (error) {
       console.error("Error adding document: ", error);
       setStatus("Error submitting form. Please try again.");

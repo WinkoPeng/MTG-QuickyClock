@@ -8,6 +8,23 @@ const UserBulletinBoard = () => {
   const [bulletins, setBulletins] = useState([]);
   const [showAll, setShowAll] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Calculate total number of pages
+  const totalPages = Math.ceil(bulletins.length / itemsPerPage);
+
+  // Get current items to display
+  const currentItems = bulletins.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   useEffect(() => {
     const fetchBulletins = async () => {
@@ -88,10 +105,10 @@ const UserBulletinBoard = () => {
       {/* Full list overlay */}
       {showAll && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-lg max-h-[80vh] overflow-y-auto relative">
+          <div className="relative bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-lg max-h-[80vh] overflow-y-auto">
             <button
               onClick={() => setShowAll(false)}
-              className="absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+              className="absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 z-10"
               aria-label="Close"
             >
               <svg
@@ -113,7 +130,7 @@ const UserBulletinBoard = () => {
               All Announcements
             </h2>
             <ul className="space-y-2">
-              {bulletins.map((bulletin) => (
+              {currentItems.map((bulletin) => (
                 <li
                   key={bulletin.id}
                   className="p-2 bg-gray-50 dark:bg-gray-700 shadow-md rounded-lg"
@@ -135,6 +152,25 @@ const UserBulletinBoard = () => {
                 </li>
               ))}
             </ul>
+            <div className="flex justify-between items-center mt-4">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 text-sm"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 text-sm"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       )}

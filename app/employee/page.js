@@ -29,6 +29,7 @@ const Employee = () => {
   const [showSentFormsModal, setSentFormsModal] = useState(false);
   const [empData, setEmpData] = useState({});
   const [employeeDocId, setEmployeeDocId] = useState("");
+  const [forms, setForms] = useState([]);
 
   const handleAutoLogout = useCallback(() => {
     router.push("/");
@@ -72,23 +73,29 @@ const Employee = () => {
     if (storedUserId) {
       setUserId(storedUserId);
       fetchData(storedUserId); // Fetch data when userId changes
+      fetchSentForms(storedUserId);
     }
   }, [userId]);
 
-  // Function to update fields using the stored document ID
-  const updateField = async (fieldName, value) => {
-    if (!employeeDocId) {
-      console.error("Document ID not available");
-      return;
-    }
-
+  const fetchSentForms = async (userId) => {
     try {
-      const docRef = doc(db, "employee", employeeDocId);
-      await updateDoc(docRef, {
-        [fieldName]: value,
+      const messagesRef = collection(db, "messages");
+      const q = query(messagesRef, where("userId", "==", userId));
+      const querySnapshot = await getDocs(q);
+      const formsData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Sort forms by the most recent date
+      formsData.sort((a, b) => {
+        const dateA = new Date(a.createdAt.seconds * 1000);
+        const dateB = new Date(b.createdAt.seconds * 1000);
+        return dateB - dateA; // Sort in descending order
       });
-    } catch (error) {
-      console.error("Error updating document:", error);
+      setForms(formsData);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -155,7 +162,7 @@ const Employee = () => {
             </div>
 
             {/* Time Section */}
-            <div className="text-sm md:text-base lg:text-lg xl:text-xl bg-light dark:bg-gray-800 rounded-lg text-center md:text-left lg:text-center">
+            <div className="text-sm md:text-base lg:text-lg xl:text-xl bg-lighter dark:bg-gray-800 rounded-lg text-center md:text-left lg:text-center">
               <p className="text-gray-900 dark:text-gray-100">
                 Current Time:{" "}
                 <span className="font-semibold">{currentTime}</span>
@@ -225,19 +232,22 @@ const Employee = () => {
 
               <div className="flex flex-row space-x-4 sm:flex-col sm:space-x-0 sm:space-y-4 mt-4">
                 <button
-                  className="w-full py-2 px-4 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  className="w-full py-1 px-2 sm:py-2 sm:px-4 text-xs sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
                   onClick={() => setShowContactModal(true)}
                 >
                   Contact Admins
                 </button>
                 <button
-                  className="w-full py-2 px-4 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
-                  onClick={() => setSentFormsModal(true)}
+                  className="w-full py-1 px-2 sm:py-2 sm:px-4 text-xs sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  onClick={() => {
+                    setSentFormsModal(true);
+                    console.log(showSentFormsModal);
+                  }}
                 >
                   View Sent Contact Forms
                 </button>
                 <button
-                  className="w-full py-2 px-4 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
+                  className="w-full py-1 px-2 sm:py-2 sm:px-4 text-xs sm:text-sm bg-blue-600 dark:bg-blue-700 text-white rounded"
                   onClick={() => setShowPasswordModal(true)}
                 >
                   Change Password
@@ -248,27 +258,6 @@ const Employee = () => {
 
           <WorkHours employeeId={userId} />
           <Logs employeeData={empData} />
-
-          {/*log.length > 0 && (
-            <div className="mt-4 bg-light dark:bg-gray-800 p-4 rounded-lg">
-              <table className="w-full text-left text-gray-900 dark:text-gray-100">
-                <thead>
-                  <tr className="border-b dark:border-gray-700">
-                    <th className="py-2 px-4">Time</th>
-                    <th className="py-2 px-4">Message</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {log.map((entry, index) => (
-                    <tr key={index} className="border-b dark:border-gray-700">
-                      <td className="py-2 px-4">{entry.time}</td>
-                      <td className="py-2 px-4">{entry.message}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )*/}
         </div>
 
         {isLoading && (
@@ -304,16 +293,17 @@ const Employee = () => {
           showPasswordModal={showPasswordModal}
           setShowPasswordModal={setShowPasswordModal}
         />
-        {showContactModal && (
-          <Contact
-            userId={userId}
-            name={userName}
-            showContactModal={showContactModal}
-            setShowContactModal={setShowContactModal}
-          />
-        )}
-        <SentForms
+
+        <Contact
           userId={userId}
+          name={userName}
+          showContactModal={showContactModal}
+          setShowContactModal={setShowContactModal}
+          fetchForms={fetchSentForms}
+        />
+
+        <SentForms
+          formData={forms}
           showSentFormsModal={showSentFormsModal}
           setSentFormsModal={setSentFormsModal}
         />

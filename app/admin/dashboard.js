@@ -22,6 +22,7 @@ function Dashboard() {
     minutes: 0,
   });
   const [weeklyWorkHours, setWeeklyWorkHours] = useState([]);
+  const [monthlyWorkHours, setMonthlyWorkHours] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   // Fetch employee data from Firestore and apply filters
@@ -61,8 +62,8 @@ function Dashboard() {
   // Update statistics based on the filtered data
   const updateStatistics = (filteredData) => {
     const today = DateTime.now();
-
     const yesterday = today.minus({ days: 1 }).toISODate();
+    const last28DaysStart = today.minus({ days: 27 }).startOf("day");
 
     // Calculate the number of employees working today
     const employeesWorkingToday = filteredData.filter((emp) => {
@@ -101,6 +102,16 @@ function Dashboard() {
       return { name: `${emp.firstName} ${emp.lastName}`, workHours };
     });
 
+    // Calculate work hours for the last 28 days
+    const last28DaysData = filteredData.map((emp) => {
+      const workPeriod = emp.workPeriod || {};
+      const workHours = Array.from({ length: 28 }, (_, i) => {
+        const date = last28DaysStart.plus({ days: i }).toFormat("yyyy-MM-dd");
+        return (workPeriod[date] || 0) / 60;
+      });
+      return { name: `${emp.firstName} ${emp.lastName}`, workHours };
+    });
+
     // Update state with calculated statistics
     setWorkingTodayCount(employeesWorkingToday.length);
     setWorkingTodayEmployees(employeesWorkingToday);
@@ -108,6 +119,7 @@ function Dashboard() {
     setTotalEmployees(filteredData.length);
     setAverageWorkHours({ hours: avgHours, minutes: avgMinutes });
     setWeeklyWorkHours(weeklyData);
+    setMonthlyWorkHours(last28DaysData); // Update this with your new state
   };
 
   // Handle search input change
@@ -309,28 +321,41 @@ function Dashboard() {
                   Last Online
                 </th>
                 <th className="border-b px-4 py-2 text-left bg-gray-100 dark:bg-gray-700 text-sm md:text-base dark:text-gray-300">
-                  This Month&apos;s Work Hours
+                  Work Hours (Last 28 Days)
                 </th>
               </tr>
             </thead>
             <tbody>
-              {filteredEmployeeData.map((row, index) => (
-                <tr
-                  key={index}
-                  className="text-sm md:text-base dark:text-gray-200"
-                >
-                  <td className="border-b px-4 py-2">{row.firstName}</td>
-                  <td className="border-b px-4 py-2">{row.lastName}</td>
-                  <td className="border-b px-4 py-2">{row.title}</td>
-                  <td className="border-b px-4 py-2">
-                    {row.status == "offline" ? "Clocked out" : "Clocked in"}
-                  </td>
-                  <td className="border-b px-4 py-2">{row.lastOnlineDate}</td>
-                  <td className="border-b px-4 py-2">
-                    {(row.thisMonthWorkDuration / 60).toFixed(1)}h
-                  </td>
-                </tr>
-              ))}
+              {filteredEmployeeData.map((row, index) => {
+                // Find the employee's work hours for the last 28 days
+                const monthlyHoursData = monthlyWorkHours.find(
+                  (emp) => emp.name === `${row.firstName} ${row.lastName}`
+                );
+                const totalMonthlyHours = monthlyHoursData
+                  ? monthlyHoursData.workHours.reduce(
+                      (sum, hours) => sum + hours,
+                      0
+                    )
+                  : 0;
+
+                return (
+                  <tr
+                    key={index}
+                    className="text-sm md:text-base dark:text-gray-200"
+                  >
+                    <td className="border-b px-4 py-2">{row.firstName}</td>
+                    <td className="border-b px-4 py-2">{row.lastName}</td>
+                    <td className="border-b px-4 py-2">{row.title}</td>
+                    <td className="border-b px-4 py-2">
+                      {row.status === "offline" ? "Clocked out" : "Clocked in"}
+                    </td>
+                    <td className="border-b px-4 py-2">{row.lastOnlineDate}</td>
+                    <td className="border-b px-4 py-2">
+                      {totalMonthlyHours.toFixed(1)}h
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

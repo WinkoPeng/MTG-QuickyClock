@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const Header = ({ title, adminName, onLogout }) => {
   return (
-    <div className="bg-primaryDark border-b border-b-1 border-black p-1 shadow-md flex items-center justify-between">
+    <div className="bg-primaryDark p-1 flex items-center justify-between">
       <div className="flex items-center justify-center">
         <Image
           src="/images/mtgLogo.png"

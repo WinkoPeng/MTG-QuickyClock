@@ -44,18 +44,18 @@ const WorkHours = ({ employeeId }) => {
   );
 
   return (
-    <div className="p-6 bg-light dark:bg-gray-900 min-h-screen">
-      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+    <div className="p-4 bg-light dark:bg-gray-900">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
         Your Weekly Work Hours
       </h2>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-lighter dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-700 text-left text-gray-600 dark:text-gray-300">
-              <th className="px-6 py-3 border-b border-gray-200 dark:border-gray-600">
+              <th className="px-4 py-2 border-b border-gray-200 dark:border-gray-600">
                 Day
               </th>
-              <th className="px-6 py-3 border-b border-gray-200 dark:border-gray-600">
+              <th className="px-4 py-2 border-b border-gray-200 dark:border-gray-600">
                 Hours
               </th>
             </tr>
@@ -63,10 +63,10 @@ const WorkHours = ({ employeeId }) => {
           <tbody>
             {sortedWorkHours.map(([day, hours]) => (
               <tr key={day} className="hover:bg-gray-50 dark:hover:bg-gray-600">
-                <td className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100">
+                <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100">
                   {day}
                 </td>
-                <td className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100">
+                <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100">
                   {hours}
                 </td>
               </tr>

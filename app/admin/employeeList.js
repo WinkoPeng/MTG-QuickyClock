@@ -110,8 +110,12 @@ function EmployeeList({ onEdit, onAdd }) {
             className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md text-center"
           >
             <h3 className="text-lg font-semibold mb-2 dark:text-gray-100">
-              {employee.firstName} {employee.lastName} - {employee.title}
+              <div>
+                {employee.firstName} {employee.lastName}
+              </div>
+              <div className="text-sm">{employee.title}</div>
             </h3>
+            <p className="text-sm mb-2 dark:text-gray-200">ID: {employee.id}</p>
             <p className="text-sm mb-2 dark:text-gray-200">
               Status:{" "}
               <span
@@ -124,14 +128,10 @@ function EmployeeList({ onEdit, onAdd }) {
                 {employee.status === "online" ? "Clocked In" : "Clocked Out"}
               </span>
             </p>
-            <p className="text-sm mb-2 dark:text-gray-200">
+            {/*<p className="text-sm mb-2 dark:text-gray-200">
               Today&apos;s Work Hours:{" "}
               {formatWorkDuration(employee.workDurationToday)}
-            </p>
-            <p className="text-sm mb-4 dark:text-gray-200">
-              This Month&apos;s Work Hours:{" "}
-              {formatWorkDuration(employee.thisMonthWorkDuration || 0)}
-            </p>
+            </p>*/}
             <button
               onClick={() => onEdit(employee)}
               className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"

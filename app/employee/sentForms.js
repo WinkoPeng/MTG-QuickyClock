@@ -1,47 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import db from "../firebase";
 
-const SentForms = ({ userId, showSentFormsModal, setSentFormsModal }) => {
+const SentForms = ({ formData, showSentFormsModal, setSentFormsModal }) => {
   const [forms, setForms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchSentForms = async () => {
-      setLoading(true);
-      try {
-        const messagesRef = collection(db, "messages");
-        const q = query(messagesRef, where("userId", "==", userId));
-        const querySnapshot = await getDocs(q);
-        const formsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Sort forms by the most recent date
-        formsData.sort((a, b) => {
-          const dateA = new Date(a.createdAt.seconds * 1000);
-          const dateB = new Date(b.createdAt.seconds * 1000);
-          return dateB - dateA; // Sort in descending order
-        });
-
-        setForms(formsData);
-      } catch (err) {
-        setError("Error fetching messages");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSentForms();
-  }, [userId]);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+    formData && setForms(formData);
+  }, [formData]);
 
   return (
     <>
@@ -75,14 +41,14 @@ const SentForms = ({ userId, showSentFormsModal, setSentFormsModal }) => {
                         {form.message}
                       </p>
                       <p className="text-gray-800 dark:text-gray-200">
-                        <strong className="font-semibold">Status:</strong>{" "}
-                        {form.status}
-                      </p>
-                      <p className="text-gray-800 dark:text-gray-200">
                         <strong className="font-semibold">Time:</strong>{" "}
                         {new Date(
                           form.createdAt.seconds * 1000
                         ).toLocaleString()}
+                      </p>
+                      <p className="text-gray-800 dark:text-gray-200">
+                        <strong className="font-semibold">Status:</strong>{" "}
+                        {form.status}
                       </p>
                     </li>
                   ))}

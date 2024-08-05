@@ -15,6 +15,7 @@ const Timesheet = () => {
     direction: "ascending",
   });
   const [titleFilter, setTitleFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchEmployees = useCallback(async () => {
     const querySnapshot = await getDocs(collection(db, "employee"));
@@ -214,13 +215,20 @@ const Timesheet = () => {
         (employee) => employee.title === titleFilter
       );
     }
+    if (searchTerm) {
+      sortableEmployees = sortableEmployees.filter((employee) =>
+        `${employee.firstName} ${employee.lastName}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+    }
     return sortableEmployees;
-  }, [sortedEmployees, titleFilter]);
+  }, [sortedEmployees, titleFilter, searchTerm]);
 
   return (
     <div className="bg-light dark:bg-gray-900 pt-6">
       <div className="flex flex-col md:flex-row gap-4 mb-4 bg-lighter dark:bg-gray-800 p-2 rounded-lg">
-        <div className="flex flex-col w-full md:w-1/3">
+        <div className="flex flex-col w-full md:w-1/4">
           <label htmlFor="start-date" className="mb-2">
             Start Date
           </label>
@@ -232,7 +240,7 @@ const Timesheet = () => {
             className="p-2 border rounded-md w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
           />
         </div>
-        <div className="flex flex-col w-full md:w-1/3">
+        <div className="flex flex-col w-full md:w-1/4">
           <label htmlFor="end-date" className="mb-2">
             End Date
           </label>
@@ -244,7 +252,7 @@ const Timesheet = () => {
             className="p-2 border rounded-md w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
           />
         </div>
-        <div className="flex flex-col w-full md:w-1/3">
+        <div className="flex flex-col w-full md:w-1/4">
           <label htmlFor="title-filter" className="mb-2">
             Employee Title
           </label>
@@ -262,6 +270,19 @@ const Timesheet = () => {
             <option value="Receptionist">Receptionist</option>
             <option value="Program Coordinator">Program Coordinator</option>
           </select>
+        </div>
+        <div className="flex flex-col w-full md:w-1/4">
+          <label htmlFor="search" className="mb-2">
+            Search by Name
+          </label>
+          <input
+            type="text"
+            id="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by name..."
+            className="p-2 border rounded-md w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+          />
         </div>
         <div className="flex items-end">
           <button
